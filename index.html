@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Educativa — Selezione Difficoltà</title>
+  <style>
+    :root{--bg:#f0f8ff;--card:#fff;--primary:#4CAF50;--primary2:#45a049;--accent:#2196F3;--accent2:#1976D2;--warn:#ff9800;--warn2:#f57c00;--ok:#4CAF50;--bad:#f44336;--text:#333}
+    *{box-sizing:border-box}
+    body{margin:0;padding:20px;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:900px;margin:0 auto;background:var(--card);border-radius:12px;box-shadow:0 8px 16px rgba(0,0,0,.08);padding:24px}
+    h1{margin:0 0 4px;text-align:center}
+    .subtitle{margin:0 0 16px;text-align:center;color:#666}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+    .section{display:none;margin-top:16px}
+    .section.active{display:block}
+    button{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:14px 16px;font-size:16px;border:none;border-radius:10px;cursor:pointer;transition:transform .15s, box-shadow .15s, background .15s}
+    button:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,0,0,.12)}
+    .subject-btn{background:linear-gradient(45deg,var(--primary),var(--primary2));color:#fff}
+    .diff-btn{background:#e8f5e9;color:#2e7d32;border:2px solid #a5d6a7}
+    .diff-btn:hover{background:#dcedc8}
+    .answer-btn{background:var(--accent);color:#fff;margin:6px;border-radius:8px;min-width:120px}
+    .answer-btn:hover{background:var(--accent2)}
+    .back-btn{background:var(--warn);color:#fff;max-width:220px}
+    .back-btn:hover{background:var(--warn2)}
+    .correct{background:var(--ok)!important}
+    .wrong{background:var(--bad)!important}
+    .card{background:#f9fbfd;border:1px solid #e6eef6;border-radius:12px;padding:18px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .center{text-align:center}
+    .score{font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎓 App Educativa</h1>
+    <p class="subtitle">Scegli la materia e poi il livello di difficoltà</p>
+
+    <!-- Menu Materie -->
+    <div id="mainMenu" class="section active">
+      <h2>Materie</h2>
+      <div class="grid">
+        <button class="subject-btn" onclick="startSubject('math')">📊 Matematica</button>
+        <button class="subject-btn" onclick="startSubject('english')">🇬🇧 Inglese</button>
+        <button class="subject-btn" onclick="startSubject('italian')">🇮🇹 Italiano</button>
+        <button class="subject-btn" onclick="startSubject('geography')">🌍 Geografia</button>
+        <button class="subject-btn" onclick="startSubject('science')">🔬 Scienze</button>
+        <button class="subject-btn" onclick="startSubject('music')">🎵 Musica</button>
+      </div>
+    </div>
+
+    <!-- Sezione Scelta Difficoltà -->
+    <div id="difficultySection" class="section">
+      <button class="back-btn" onclick="goHome()">← Torna al Menu</button>
+      <div class="card" style="margin-top:12px">
+        <h2 class="center" id="diffTitle">Seleziona difficoltà</h2>
+        <p class="center" id="diffSubtitle" style="color:#666;margin-top:-6px">Scegli tra Facile, Medio o Difficile</p>
+        <div class="grid" style="margin-top:12px">
+          <button class="diff-btn" onclick="startQuizWithDifficulty('easy')">😊 Facile</button>
+          <button class="diff-btn" onclick="startQuizWithDifficulty('medium')">🙂 Medio</button>
+          <button class="diff-btn" onclick="startQuizWithDifficulty('hard')">😤 Difficile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sezione Quiz -->
+    <div id="quizSection" class="section">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <button class="back-btn" onclick="backToDifficulty()">← Cambia Difficoltà</button>
+        <div class="score" id="scoreDisplay">Punteggio: 0/0</div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3 id="questionText">Caricamento domanda...</h3>
+        <div id="answersContainer" class="row"></div>
+        <div id="hintText" style="margin-top: 8px; font-style: italic; color: #666;"></div>
+      </div>
+      <div class="center">
+        <button id="nextBtn" onclick="nextQuestion()" style="display:none;max-width:260px;background:var(--ok);color:#fff">Prossima Domanda</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Stato globale
+    let selectedSubject = '';
+    let selectedDifficulty = 'easy';
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // Domande — MATEMATICA organizzata per operazione e difficoltà
+    const mathQuestions = {
+      addition: {
+        easy: [
+          { id: 1, question: "2 + 3 = ?", answers: ["4","5","6","7"], correct: 1, hint: "Conta sulle dita!" },
+          { id: 2, question: "1 + 4 = ?", answers: ["3","4","5","6"], correct: 2, hint: "Uno più quattro..." },
+          { id: 3, question: "3 + 2 = ?", answers: ["4","5","6","7"], correct: 1, hint: "Tre più due fa..." }
+        ],
+        medium: [
+          { id: 4, question: "15 + 23 = ?", answers: ["35","38","40","42"], correct: 1, hint: "15+20=35, poi +3" },
+          { id: 5, question: "27 + 18 = ?", answers: ["43","45","47","49"], correct: 1, hint: "30+15" },
+          { id: 6, question: "34 + 29 = ?", answers: ["61","63","65","67"], correct: 1, hint: "34+30=64 poi -1" }
+        ],
+        hard: [
+          { id: 7, question: "156 + 247 = ?", answers: ["403","393","413","383"], correct: 0, hint: "Somma colonna per colonna" },
+          { id: 8, question: "289 + 156 = ?", answers: ["435","445","455","425"], correct: 1, hint: "Inizia dalle unità" },
+          { id: 9, question: "378 + 294 = ?", answers: ["662","672","682","652"], correct: 1, hint: "Attento ai riporti" }
+        ]
+      },
+      subtraction: {
+        easy: [
+          { id: 10, question: "5 - 2 = ?", answers: ["2","3","4","1"], correct: 1, hint: "Togli due da cinque" },
+          { id: 11, question: "8 - 3 = ?", answers: ["4","5","6","7"], correct: 1, hint: "Otto meno tre" },
+          { id: 12, question: "7 - 4 = ?", answers: ["2","3","4","5"], correct: 1, hint: "Sette meno quattro" }
+        ],
+        medium: [
+          { id: 13, question: "45 - 18 = ?", answers: ["25","27","29","31"], correct: 1, hint: "45-20=25, poi +2" },
+          { id: 14, question: "63 - 27 = ?", answers: ["34","36","38","40"], correct: 1, hint: "63-30=33, poi +3" },
+          { id: 15, question: "52 - 19 = ?", answers: ["31","33","35","37"], correct: 1, hint: "52-20=32, poi +1" }
+        ],
+        hard: [
+          { id: 16, question: "234 - 156 = ?", answers: ["78","88","68","98"], correct: 0, hint: "Prestiti in colonna" },
+          { id: 17, question: "345 - 178 = ?", answers: ["167","177","157","187"], correct: 0, hint: "5-8 richiede prestito" },
+          { id: 18, question: "456 - 289 = ?", answers: ["167","177","157","187"], correct: 0, hint: "Attento ai prestiti" }
+        ]
+      },
+      multiplication: {
+        easy: [
+          { id: 19, question: "2 × 3 = ?", answers: ["5","6","7","8"], correct: 1, hint: "Due volte tre" },
+          { id: 20, question: "4 × 2 = ?", answers: ["6","7","8","9"], correct: 2, hint: "Quattro volte due" }
+        ],
+        medium: [
+          { id: 21, question: "7 × 8 = ?", answers: ["54","56","58","60"], correct: 1, hint: "Tabellina del 7" },
+          { id: 22, question: "9 × 6 = ?", answers: ["52","54","56","58"], correct: 1, hint: "Nove volte sei" }
+        ],
+        hard: [
+          { id: 23, question: "23 × 15 = ?", answers: ["345","335","355","325"], correct: 0, hint: "(23×10)+(23×5)" },
+          { id: 24, question: "34 × 12 = ?", answers: ["408","418","398","428"], correct: 0, hint: "(34×10)+(34×2)" }
+        ]
+      },
+      division: {
+        easy: [
+          { id: 25, question: "6 ÷ 2 = ?", answers: ["2","3","4","5"], correct: 1, hint: "Sei diviso due" },
+          { id: 26, question: "8 ÷ 4 = ?", answers: ["1","2","3","4"], correct: 1, hint: "Otto diviso quattro" }
+        ],
+        medium: [
+          { id: 27, question: "56 ÷ 7 = ?", answers: ["7","8","9","10"], correct: 1, hint: "Quale numero ×7 fa 56?" },
+          { id: 28, question: "72 ÷ 9 = ?", answers: ["7","8","9","10"], correct: 1, hint: "Settantadue diviso nove" }
+        ],
+        hard: [
+          { id: 29, question: "144 ÷ 12 = ?", answers: ["11","12","13","14"], correct: 1, hint: "Quale numero ×12 fa 144?" },
+          { id: 30, question: "156 ÷ 13 = ?", answers: ["11","12","13","14"], correct: 1, hint: "Dividi passo-passo" }
+        ]
+      }
+    };
+
+    // Altre materie — già in Facile/Medio/Difficile
+    const englishQuestions = {
+      easy: [
+        { id: 1, question: "Come si dice 'cane' in inglese?", answers: ["Cat","Dog","Bird","Fish"], correct: 1, hint: "Migliore amico dell'uomo" }
+      ],
+      medium: [
+        { id: 2, question: "Come si dice 'rosso' in inglese?", answers: ["Blue","Green","Red","Yellow"], correct: 2, hint: "Il colore del fuoco" }
+      ],
+      hard: [
+        { id: 3, question: "Come si dice 'casa' in inglese?", answers: ["House","Car","Tree","Book"], correct: 0, hint: "Dove vivi" }
+      ]
+    };
+
+    const italianQuestions = {
+      easy: [
+        { id: 1, question: "Qual è il plurale di 'libro'?", answers: ["Libri","Libra","Libre","Libros"], correct: 0, hint: "Cambia la 'o' finale" }
+      ],
+      medium: [
+        { id: 2, question: "Quale articolo va con 'zaino'?", answers: ["La","Lo","Il","Gli"], correct: 1, hint: "Inizia con 'z'" }
+      ],
+      hard: [
+        { id: 3, question: "Come si scrive il passato di 'andare' (io)?", answers: ["Andai","Sono andato","Vado","Andrò"], correct: 1, hint: "Passato prossimo con essere" }
+      ]
+    };
+
+    const geographyQuestions = {
+      easy: [
+        { id: 1, question: "Qual è la capitale d'Italia?", answers: ["Milano","Napoli","Roma","Torino"], correct: 2, hint: "La città eterna" }
+      ],
+      medium: [
+        { id: 2, question: "Quale fiume attraversa Parigi?", answers: ["Tamigi","Senna","Danubio","Reno"], correct: 1, hint: "Inizia con 'S'" }
+      ],
+      hard: [
+        { id: 3, question: "Qual è il continente più grande?", answers: ["Africa","Europa","Asia","America"], correct: 2, hint: "Cina e India" }
+      ]
+    };
+
+    const scienceQuestions = {
+      easy: [
+        { id: 1, question: "Quanti pianeti ci sono nel sistema solare?", answers: ["7","8","9","10"], correct: 1, hint: "Plutone non lo è più" }
+      ],
+      medium: [
+        { id: 2, question: "Qual è il gas più abbondante nell'aria?", answers: ["Ossigeno","Azoto","CO₂","Idrogeno"], correct: 1, hint: "Non è l'ossigeno" }
+      ],
+      hard: [
+        { id: 3, question: "A che temperatura bolle l'acqua?", answers: ["90°C","95°C","100°C","105°C"], correct: 2, hint: "Numero tondo" }
+      ]
+    };
+
+    const musicQuestions = {
+      easy: [
+        { id: 1, question: "Quante note musicali ci sono?", answers: ["5","6","7","8"], correct: 2, hint: "Do, Re, Mi..." }
+      ],
+      medium: [
+        { id: 2, question: "Quale strumento ha 88 tasti?", answers: ["Chitarra","Violino","Pianoforte","Flauto"], correct: 2, hint: "Strumento a tastiera" }
+      ],
+      hard: [
+        { id: 3, question: "Chi ha composto 'La Primavera'?", answers: ["Mozart","Beethoven","Vivaldi","Bach"], correct: 2, hint: "Barocco italiano" }
+      ]
+    };
+
+    // Helpers
+    function showSection(id){
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+    function shuffleArray(a){
+      for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a
+    }
+
+    // Costruisce domande di matematica filtrando per difficoltà su tutte le operazioni
+    function getMathByDifficulty(level){
+      let all=[];
+      for(const op in mathQuestions){
+        if(mathQuestions[op][level]) all=all.concat(mathQuestions[op][level]);
+      }
+      return all;
+    }
+
+    // Generico per le altre materie
+    function getByDifficulty(subjectQuestions, level){
+      return subjectQuestions[level] ? [...subjectQuestions[level]] : [];
+    }
+
+    // Flusso UI
+    function startSubject(subject){
+      selectedSubject = subject;
+      selectedDifficulty = 'easy';
+      document.getElementById('diffTitle').textContent = `Seleziona difficoltà — ${labelSubject(subject)}`;
+      showSection('difficultySection');
+    }
+
+    function labelSubject(s){
+      return {
+        math:'Matematica', english:'Inglese', italian:'Italiano', geography:'Geografia', science:'Scienze', music:'Musica'
+      }[s] || s;
+    }
+
+    function startQuizWithDifficulty(level){
+      selectedDifficulty = level;
+      currentQuestionIndex = 0; score = 0; answered = false;
+
+      switch(selectedSubject){
+        case 'math':
+          currentQuestions = getMathByDifficulty(level);
+          break;
+        case 'english':
+          currentQuestions = getByDifficulty(englishQuestions, level);
+          break;
+        case 'italian':
+          currentQuestions = getByDifficulty(italianQuestions, level);
+          break;
+        case 'geography':
+          currentQuestions = getByDifficulty(geographyQuestions, level);
+          break;
+        case 'science':
+          currentQuestions = getByDifficulty(scienceQuestions, level);
+          break;
+        case 'music':
+          currentQuestions = getByDifficulty(musicQuestions, level);
+          break;
+      }
+
+      currentQuestions = shuffleArray([...currentQuestions]);
+      showSection('quizSection');
+      showQuestion();
+    }
+
+    function backToDifficulty(){ showSection('difficultySection'); }
+    function goHome(){ showSection('mainMenu'); }
+
+    // Quiz core
+    function showQuestion(){
+      if(currentQuestionIndex >= currentQuestions.length){ return showFinalScore(); }
+      const q = currentQuestions[currentQuestionIndex];
+      answered = false;
+      document.getElementById('questionText').textContent = q.question;
+      document.getElementById('hintText').textContent = `💡 Suggerimento: ${q.hint}`;
+      document.getElementById('scoreDisplay').textContent = `Punteggio: ${score}/${currentQuestionIndex}`;
+      document.getElementById('nextBtn').style.display = 'none';
+
+      const box = document.getElementById('answersContainer');
+      box.innerHTML = '';
+      q.answers.forEach((ans, idx)=>{
+        const b = document.createElement('button');
+        b.className = 'answer-btn';
+        b.textContent = ans;
+        b.onclick = ()=>selectAnswer(idx);
+        box.appendChild(b);
+      });
+    }
+
+    function selectAnswer(selectedIdx){
+      if(answered) return; answered = true;
+      const q = currentQuestions[currentQuestionIndex];
+      const btns = document.querySelectorAll('.answer-btn');
+      btns.forEach((b, idx)=>{
+        if(idx === q.correct) b.classList.add('correct');
+        else if(idx === selectedIdx) b.classList.add('wrong');
+        b.disabled = true;
+      });
+      if(selectedIdx === q.correct) score++;
+      document.getElementById('nextBtn').style.display = 'inline-flex';
+    }
+
+    function nextQuestion(){ currentQuestionIndex++; showQuestion(); }
+
+    function showFinalScore(){
+      const total = currentQuestions.length || 0;
+      const pct = total ? Math.round((score/total)*100) : 0;
+      let msg = pct>=90 ? '🏆 Eccellente!' : pct>=70 ? '👍 Molto bene!' : pct>=50 ? '👌 Discreto!' : '💪 Continua a studiare!';
+      document.getElementById('questionText').innerHTML = `
+        <h2>Quiz completato — ${labelSubject(selectedSubject)} (${labelDifficulty(selectedDifficulty)})</h2>
+        <p>Punteggio finale: <strong>${score}/${total}</strong> (${pct}%)</p>
+        <p>${msg}</p>`;
+      document.getElementById('answersContainer').innerHTML = '';
+      document.getElementById('hintText').textContent = '';
+      document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    function labelDifficulty(d){
+      return d==='easy'?'Facile':d==='medium'?'Medio':'Difficile';
+    }
+  </script>
+</body>
+</html>
