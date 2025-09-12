@@ -184,7 +184,7 @@
         // ---------- Storage (Resilient Loading) ----------
         const STORAGE_KEY = 'kids_learner_v2';
         const defaultSubjects = ['Matematica', 'Inglese', 'Italiano', 'Geografia', 'Scienze', 'Musica'];
-        const baseStats = () => ({ subjectScore: 0, today: {}, unique: new Set(), uniqueArr: [] });
+        const baseStats = () => ({ subjectScore: { easy: 0, medium: 0, hard: 0 }, today: {}, unique: new Set(), uniqueArr: [] });
 
         function load() {
             let data;
@@ -206,9 +206,13 @@
                 };
                 save(data);
             }
+            // Data migration and validation
             data.profiles.forEach(p => {
                 defaultSubjects.forEach(s => {
                     p.subjects[s] = p.subjects[s] || baseStats();
+                    if (typeof p.subjects[s].subjectScore !== 'object' || p.subjects[s].subjectScore === null) {
+                        p.subjects[s].subjectScore = { easy: 0, medium: 0, hard: 0 };
+                    }
                     p.subjects[s].unique = new Set(p.subjects[s].uniqueArr || []);
                 });
             });
@@ -253,7 +257,10 @@
 
         function updateHeaderStats() {
             const p = getCurrentProfile();
-            $('#subjectScore').textContent = (p.subjects[$('#subject').value] || {subjectScore: 0}).subjectScore;
+            const subjData = p.subjects[$('#subject').value] || baseStats();
+            const scores = subjData.subjectScore;
+            const totalScore = (scores.easy || 0) + (scores.medium || 0) + (scores.hard || 0);
+            $('#subjectScore').textContent = totalScore;
             updateTodayKpis();
         }
 
@@ -266,8 +273,18 @@
             const profile = getCurrentProfile();
             container.innerHTML = '';
             defaultSubjects.forEach(subject => {
-                const score = (profile.subjects[subject] || {subjectScore: 0}).subjectScore;
-                container.innerHTML += `<div class="bg-white rounded-2xl p-3 shadow-inner"><span class="text-base font-semibold text-sky-800">${subject}</span><br><b class="text-2xl font-bold text-blue-600">${score}</b></div>`;
+                const subjScores = (profile.subjects[subject] || baseStats()).subjectScore;
+                const total = (subjScores.easy || 0) + (subjScores.medium || 0) + (subjScores.hard || 0);
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl p-3 shadow-inner">
+                        <span class="text-base font-semibold text-sky-800">${subject}</span><br>
+                        <b class="text-2xl font-bold text-blue-600">${total}</b>
+                        <div class="text-xs text-slate-500 mt-1 grid grid-cols-3 gap-1">
+                           <span>F: <b class="text-green-600">${subjScores.easy || 0}</b></span>
+                           <span>M: <b class="text-orange-500">${subjScores.medium || 0}</b></span>
+                           <span>D: <b class="text-red-600">${subjScores.hard || 0}</b></span>
+                        </div>
+                    </div>`;
             });
         }
 
@@ -327,9 +344,15 @@
         function recordResult(correct) {
             const profile = getCurrentProfile();
             const subj = $('#subject').value;
-            const pts = correct ? POINTS[$('#level').value] : 0;
+            const level = $('#level').value;
+            const pts = correct ? POINTS[level] : 0;
             const subjStats = profile.subjects[subj];
-            subjStats.subjectScore += pts;
+            
+            if (typeof subjStats.subjectScore !== 'object' || subjStats.subjectScore === null) {
+                subjStats.subjectScore = { easy: 0, medium: 0, hard: 0 };
+            }
+            subjStats.subjectScore[level] += pts;
+
             const today = subjStats.today[todayStr()] || (subjStats.today[todayStr()] = { score: 0, completed: 0 });
             today.score += pts; today.completed += 1;
             save(app);
@@ -355,11 +378,10 @@
             const profile = getCurrentProfile();
             let attempt = 0, pak;
             
-            // --- CICLO ANTI-BLOCCO ---
             while(attempt < 50) {
                 pak = gen();
                 if (pak && typeof pak.ok === 'function' && pak.ok(profile)) {
-                    break; // Domanda valida trovata
+                    break; 
                 }
                 attempt++;
             }
@@ -436,12 +458,28 @@
                 const p = getCurrentProfile(); const date = todayStr();
                 let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'; let totalScoreToday = 0, totalCompletedToday = 0;
                 defaultSubjects.forEach(s => {
-                    const todayData = (p.subjects[s] || {}).today[date];
-                    const scoreToday = todayData ? todayData.score : 0; const completedToday = todayData ? todayData.completed : 0;
-                    const totalSubjectScore = (p.subjects[s] || {}).subjectScore || 0;
-                    totalScoreToday += scoreToday; totalCompletedToday += completedToday;
+                    const subjData = p.subjects[s] || baseStats();
+                    const todayData = subjData.today[date];
+                    const scoreToday = todayData ? todayData.score : 0; 
+                    const completedToday = todayData ? todayData.completed : 0;
+                    const totalScores = subjData.subjectScore;
+                    const totalSubjectScore = (totalScores.easy || 0) + (totalScores.medium || 0) + (totalScores.hard || 0);
+                    
+                    totalScoreToday += scoreToday; 
+                    totalCompletedToday += completedToday;
+
                     if (totalSubjectScore > 0 || completedToday > 0) {
-                        html += `<div class="bg-white rounded-xl p-4 shadow-inner text-base"><div class="font-bold text-sky-700 text-xl mb-1">${s}</div><div>Oggi: <b class="text-purple-500">${completedToday}</b> attività • <b class="text-green-500">${scoreToday}</b> punti</div><div class="mt-1">Punteggio Totale: <b class="text-blue-600 text-lg">${totalSubjectScore}</b> punti</div></div>`;
+                        html += `
+                        <div class="bg-white rounded-xl p-4 shadow-inner text-base">
+                            <div class="font-bold text-sky-700 text-xl mb-1">${s}</div>
+                            <div>Oggi: <b class="text-purple-500">${completedToday}</b> attività • <b class="text-green-500">${scoreToday}</b> punti</div>
+                            <div class="mt-1">Punteggio Totale: <b class="text-blue-600 text-lg">${totalSubjectScore}</b> punti</div>
+                            <div class="text-sm text-slate-600 mt-1">
+                                (Facile: <b class="text-green-600">${totalScores.easy || 0}</b>, 
+                                Medio: <b class="text-orange-600">${totalScores.medium || 0}</b>, 
+                                Difficile: <b class="text-red-600">${totalScores.hard || 0}</b>)
+                            </div>
+                        </div>`;
                     }
                 });
                 html += '</div>';
