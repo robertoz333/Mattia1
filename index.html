@@ -1,622 +1,678 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Impara & Gioca!</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
-  body {
-    font-family: 'Fredoka', sans-serif;
-    background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
-  }
-  .bg-card {
-    background: linear-gradient(180deg, #dbeafe, #eff6ff);
-  }
-  .shadow-card {
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-  }
-  .tag {
-    background: #ffffff;
-    border: 1px solid #dbeafe;
-    color: #0c4a6e;
-  }
-  button {
-    font-weight: 700;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  button:active {
-    transform: translateY(0);
-    box-shadow: none;
-  }
-  .option {
-    font-size: 1.25rem;
-    padding: 1rem;
-    border: 3px solid #cbd5e1;
-    background: #f1f5f9;
-    transition: border-color 0.2s, background-color 0.2s;
-  }
-  .option.correct {
-    border-color: #22c55e;
-    background: #dcfce7;
-  }
-  .option.wrong {
-    border-color: #ef4444;
-    background: #fee2e2;
-  }
-  .progress-bar {
-    transition: width 0.3s ease-in-out;
-  }
-  dialog {
-    padding: 0;
-    border: none;
-    border-radius: 1.5rem;
-  }
-  dialog::backdrop {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(5px);
-  }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Impara & Gioca!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
+            /* Transizione per uno zoom fluido */
+            transition: transform 0.3s ease-in-out;
+            transform-origin: top center;
+        }
+        .bg-card {
+            background: linear-gradient(180deg, #dbeafe, #eff6ff);
+        }
+        .shadow-card {
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .tag {
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            color: #0c4a6e;
+        }
+        button {
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        /* Stile per i bottoni zoom quando disabilitati */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .option {
+            font-size: 1.25rem;
+            padding: 1rem;
+            border: 3px solid #cbd5e1;
+            background: #f1f5f9;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .option.correct {
+            border-color: #22c55e;
+            background: #dcfce7;
+        }
+        .option.wrong {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+        .progress-bar {
+            transition: width 0.3s ease-in-out;
+        }
+        dialog {
+            padding: 0;
+            border: none;
+            border-radius: 1.5rem;
+        }
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+        }
+    </style>
 </head>
 <body class="text-slate-800">
-  <!-- Titolo e profili -->
-  <header class="p-6 bg-sky-300 text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="text-4xl">🚀</div>
-        <h1 class="text-3xl font-bold">Impara & Gioca!</h1>
-      </div>
-      <div class="flex flex-wrap items-center gap-4">
-        <label class="tag flex items-center gap-2 p-2 rounded-full text-lg">
-          <span class="text-xl">👤</span> Io sono:
-          <select id="profileSelect" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
-          </select>
-        </label>
-        <input id="newProfileName" type="text" placeholder="Nome nuovo amico" class="p-2 rounded-full text-slate-800 text-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <button id="addProfileBtn" class="bg-blue-500 text-white rounded-full px-6 py-2">
-          Aggiungi un amico!
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto p-4 md:p-8">
-    <div class="bg-card shadow-card rounded-3xl p-6">
-      <!-- Opzioni di gioco -->
-      <div class="flex flex-col md:flex-row gap-4 mb-6">
-        <div class="flex flex-wrap items-center gap-4">
-          <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
-            <span class="text-xl">📘</span> Materia:
-            <select id="subject" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
-              <option>Matematica</option>
-              <option>Inglese</option>
-              <option>Italiano</option>
-              <option>Geografia</option>
-              <option>Scienze</option>
-              <option>Musica</option>
-            </select>
-          </span>
-          <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
-            <span class="text-xl">🎯</span> Livello:
-            <select id="level" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
-              <option value="easy">Facile ⭐</option>
-              <option value="medium">Medio ⭐⭐</option>
-              <option value="hard">Difficile ⭐⭐⭐</option>
-            </select>
-          </span>
-          <span id="mathOpsWrap" class="tag flex items-center gap-2 p-2 rounded-full text-lg hidden">
-            <span class="text-xl">➗</span> Operazioni:
-            <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="add" checked> +</label>
-            <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="sub" checked> −</label>
-            <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="mul" checked> ×</label>
-            <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="div" checked> ÷</label>
-          </span>
+    <!-- Titolo e profili -->
+    <header class="p-6 bg-sky-300 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-4xl">🚀</div>
+                <h1 class="text-3xl font-bold">Impara & Gioca!</h1>
+                <!-- CONTROLLI ZOOM +/- AGGIUNTI QUI -->
+                <div class="flex items-center gap-2 bg-sky-400 p-1 rounded-full ml-4">
+                    <button id="zoomOutBtn" class="text-2xl font-bold w-8 h-8 rounded-full bg-white text-sky-500 hover:bg-sky-100">-</button>
+                    <span id="zoomDisplay" class="text-lg font-semibold w-16 text-center" title="Livello di zoom">100%</span>
+                    <button id="zoomInBtn" class="text-2xl font-bold w-8 h-8 rounded-full bg-white text-sky-500 hover:bg-sky-100">+</button>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-4">
+                <label class="tag flex items-center gap-2 p-2 rounded-full text-lg">
+                    <span class="text-xl">👤</span>
+                    Io sono:
+                    <select id="profileSelect" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
+                    </select>
+                </label>
+                <input id="newProfileName" type="text" placeholder="Nome nuovo amico" class="p-2 rounded-full text-slate-800 text-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <button id="addProfileBtn" class="bg-blue-500 text-white rounded-full px-6 py-2">
+                    Aggiungi un amico!
+                </button>
+            </div>
         </div>
-        <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0 md:ml-auto">
-          <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
-            <span class="text-xl">📦</span> Domande:
-            <select id="sessionSize" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
-              <option>5</option><option selected>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option>
-            </select>
-          </span>
-          <button id="startBtn" class="bg-green-500 text-white rounded-full px-8 py-3 text-xl hover:bg-green-600">
-            Inizia a Giocare! 🚀
-          </button>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <div class="bg-card shadow-card rounded-3xl p-6">
+            <!-- Opzioni di gioco -->
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
+                        <span class="text-xl">📘</span>
+                        Materia:
+                        <select id="subject" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
+                            <option>Matematica</option>
+                            <option>Inglese</option>
+                            <option>Italiano</option>
+                            <option>Geografia</option>
+                            <option>Scienze</option>
+                            <option>Musica</option>
+                        </select>
+                    </span>
+                    <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
+                        <span class="text-xl">🎯</span>
+                        Livello:
+                        <select id="level" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
+                            <option value="easy">Facile ⭐</option>
+                            <option value="medium">Medio ⭐⭐</option>
+                            <option value="hard">Difficile ⭐⭐⭐</option>
+                        </select>
+                    </span>
+                    <span id="mathOpsWrap" class="tag flex items-center gap-2 p-2 rounded-full text-lg hidden">
+                        <span class="text-xl">➗</span>
+                        Operazioni:
+                        <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="add" checked> +</label>
+                        <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="sub" checked> −</label>
+                        <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="mul" checked> ×</label>
+                        <label class="flex items-center gap-1 text-base"><input type="checkbox" class="mathop transform scale-125" value="div" checked> ÷</label>
+                    </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0 md:ml-auto">
+                    <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
+                        <span class="text-xl">📦</span>
+                        Domande:
+                        <select id="sessionSize" class="bg-transparent border-none text-lg font-semibold cursor-pointer outline-none">
+                            <option>5</option><option selected>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option>
+                        </select>
+                    </span>
+                    <button id="startBtn" class="bg-green-500 text-white rounded-full px-8 py-3 text-xl hover:bg-green-600">
+                        Inizia a Giocare! 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra dei progressi -->
+            <div class="h-4 bg-sky-200 rounded-full overflow-hidden my-6">
+                <div id="progressBar" class="h-full bg-green-400 progress-bar rounded-full"></div>
+            </div>
+
+            <!-- Domanda e aiuto -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white shadow-md rounded-2xl p-6">
+                    <h3 class="text-2xl font-bold mb-4">🧩 Domanda</h3>
+                    <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center">
+                        Premi “Inizia a Gioca!” per iniziare.
+                    </div>
+                    <div class="options grid gap-4 mt-6" id="options"></div>
+                    <div class="text-center font-semibold text-lg mt-4" id="feedback"></div>
+                </div>
+                <div class="bg-white shadow-md rounded-2xl p-6">
+                    <h3 class="text-2xl font-bold mb-4">💡 Aiuto & Suggerimenti</h3>
+                    <div id="helpBox" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-xl text-center">
+                        Premi “💡 Aiuto”, “📖 Spiegazione” o “🃏 Flashcard”.
+                    </div>
+                    <div class="flex flex-wrap gap-3 mt-6 justify-center">
+                        <button id="hintBtn" class="bg-yellow-400 text-slate-800 rounded-full px-6 py-2 text-lg hover:bg-yellow-500">💡 Aiuto</button>
+                        <button id="explainBtn" class="bg-orange-400 text-slate-800 rounded-full px-6 py-2 text-lg hover:bg-orange-500">📖 Spiegazione</button>
+                        <button id="flashBtn" class="bg-purple-400 text-white rounded-full px-6 py-2 text-lg hover:bg-purple-500">🃏 Flashcard</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiche -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8 text-center">
+                <div class="bg-white rounded-2xl p-5 shadow-inner">
+                    <span class="text-lg">⭐ Punteggio materia</span><br>
+                    <b id="subjectScore" class="text-3xl font-bold text-blue-500">0</b>
+                </div>
+                <div class="bg-white rounded-2xl p-5 shadow-inner">
+                    <span class="text-lg">🗓️ Gioco di oggi</span><br>
+                    <b id="todayCount" class="text-3xl font-bold text-purple-500">0</b>
+                </div>
+                <div class="bg-white rounded-2xl p-5 shadow-inner">
+                    <span class="text-lg">🏆 Punteggio totale oggi</span><br>
+                    <b id="todayScore" class="text-3xl font-bold text-green-500">0</b>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button id="progressBtn" class="bg-sky-400 text-white rounded-full px-8 py-3 text-lg hover:bg-sky-500">
+                    Mostra i miei progressi 📈
+                </button>
+            </div>
         </div>
-      </div>
-      
-      <!-- Barra dei progressi -->
-      <div class="h-4 bg-sky-200 rounded-full overflow-hidden my-6">
-        <div id="progressBar" class="h-full bg-green-400 progress-bar rounded-full"></div>
-      </div>
+    </main>
 
-      <!-- Domanda e aiuto -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-2xl p-6">
-          <h3 class="text-2xl font-bold mb-4">🧩 Domanda</h3>
-          <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center">
-            Premi “Inizia a Gioca!” per iniziare.
-          </div>
-          <div class="options grid gap-4 mt-6" id="options"></div>
-          <div class="text-center font-semibold text-lg mt-4" id="feedback"></div>
+    <!-- Dialogo Progressi -->
+    <dialog id="progressDialog">
+        <div class="bg-sky-100 p-8 rounded-3xl shadow-xl border-4 border-blue-200">
+            <h3 class="text-2xl font-bold text-center mb-6">📈 I tuoi progressi di oggi!</h3>
+            <div id="progressSummary" class="text-lg"></div>
+            <div class="text-center mt-6">
+                <button class="bg-red-400 text-white rounded-full px-8 py-3 text-lg hover:bg-red-500" onclick="document.getElementById('progressDialog').close()">Chiudi ❌</button>
+            </div>
         </div>
-        <div class="bg-white shadow-md rounded-2xl p-6">
-          <h3 class="text-2xl font-bold mb-4">💡 Aiuto & Suggerimenti</h3>
-          <div id="helpBox" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-xl text-center">
-            Premi “💡 Aiuto”, “📖 Spiegazione” o “🃏 Flashcard”.
-          </div>
-          <div class="flex flex-wrap gap-3 mt-6 justify-center">
-            <button id="hintBtn" class="bg-yellow-400 text-slate-800 rounded-full px-6 py-2 text-lg hover:bg-yellow-500">💡 Aiuto</button>
-            <button id="explainBtn" class="bg-orange-400 text-slate-800 rounded-full px-6 py-2 text-lg hover:bg-orange-500">📖 Spiegazione</button>
-            <button id="flashBtn" class="bg-purple-400 text-white rounded-full px-6 py-2 text-lg hover:bg-purple-500">🃏 Flashcard</button>
-          </div>
-        </div>
-      </div>
+    </dialog>
 
-      <!-- Statistiche -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8 text-center">
-        <div class="bg-white rounded-2xl p-5 shadow-inner">
-          <span class="text-lg">⭐ Punteggio materia</span><br>
-          <b id="subjectScore" class="text-3xl font-bold text-blue-500">0</b>
-        </div>
-        <div class="bg-white rounded-2xl p-5 shadow-inner">
-          <span class="text-lg">🗓️ Gioco di oggi</span><br>
-          <b id="todayCount" class="text-3xl font-bold text-purple-500">0</b>
-        </div>
-        <div class="bg-white rounded-2xl p-5 shadow-inner">
-          <span class="text-lg">🏆 Punteggio totale oggi</span><br>
-          <b id="todayScore" class="text-3xl font-bold text-green-500">0</b>
-        </div>
-      </div>
-
-      <div class="flex justify-center mt-6">
-        <button id="progressBtn" class="bg-sky-400 text-white rounded-full px-8 py-3 text-lg hover:bg-sky-500">
-          Mostra i miei progressi 📈
-        </button>
-      </div>
-    </div>
-  </main>
-
-  <!-- Dialogo Progressi -->
-  <dialog id="progressDialog">
-    <div class="bg-sky-100 p-8 rounded-3xl shadow-xl border-4 border-blue-200">
-      <h3 class="text-2xl font-bold text-center mb-6">📈 I tuoi progressi di oggi!</h3>
-      <div id="progressSummary" class="text-lg"></div>
-      <div class="text-center mt-6">
-        <button class="bg-red-400 text-white rounded-full px-8 py-3 text-lg hover:bg-red-500" onclick="document.getElementById('progressDialog').close()">Chiudi ❌</button>
-      </div>
-    </div>
-  </dialog>
-
-<script>
-(function(){
-  // ---------- Utilities ----------
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => Array.from(document.querySelectorAll(sel));
-  const todayStr = () => new Date().toISOString().slice(0,10);
-  const weekOf = (d=new Date()) => {
-    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const day = date.getUTCDay() || 7; 
-    date.setUTCDate(date.getUTCDate() + 4 - day);
-    const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-    const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
-    return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
-  }
-  const rand = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
-  const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
-  const pick = arr => arr[rand(0,arr.length-1)];
-
-  // ---------- Storage ----------
-  const STORAGE_KEY = 'kids_learner_v2';
-  const defaultSubjects = ['Matematica','Inglese','Italiano','Geografia','Scienze','Musica'];
-  const baseStats = ()=>({weeklyScore:0, subjectScore:0, today:{}, unique:new Set(), uniqueArr:[], completedToday:0});
-  function load(){
-    let data = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
-    if(!data || data.version !== 2){
-      const id = cryptoRandomId();
-      const now = new Date();
-      data = {version:2, currentProfileId:id, week:weekOf(now), profiles:[{id,name:'Bimbo',created:now.toISOString(), subjects:objFromArray(defaultSubjects,()=>baseStats())}]};
-      save(data);
-    }
-    data.profiles.forEach(p=>{
-      for(const s of defaultSubjects){
-        const subj=p.subjects[s];
-        if(subj && !subj.unique){subj.unique=new Set();}
-        if(subj && subj.uniqueArr){subj.unique=new Set(subj.uniqueArr);}
-      }
-    });
-    const w=weekOf();
-    if(data.week!==w){
-      data.week=w;
-      data.profiles.forEach(p=>{
-        defaultSubjects.forEach(s=>{
-          p.subjects[s].weeklyScore=0;
-          p.subjects[s].completedToday=0;
-        });
-      });
-      save(data);
-    }
-    return data;
-  }
-  function save(data){
-    const clone = JSON.parse(JSON.stringify(data));
-    clone.profiles.forEach(p=>{
-      defaultSubjects.forEach(s=>{
-        const subj = p.subjects[s];
-        subj.uniqueArr = Array.from(p.subjects[s].unique||[]);
-        delete subj.unique;
-      });
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(clone));
-  }
-  function cryptoRandomId(){
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c=>(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c/4).toString(16));
-  }
-  function objFromArray(arr,fn){
-    const o={};
-    arr.forEach(k=>o[k]=fn());
-    return o;
-  }
-
-  // ---------- State ----------
-  let app = load();
-  let session = { running:false, size:10, index:0, correct:0, current:null };
-
-  // ---------- UI init ----------
-  function initProfiles(){
-    const sel = $('#profileSelect');
-    sel.innerHTML='';
-    app.profiles.forEach(p=>{
-      const opt=document.createElement('option');
-      opt.value=p.id;opt.textContent=p.name;sel.appendChild(opt);
-    });
-    sel.value=app.currentProfileId;
-    updateHeaderStats();
-  }
-  function updateHeaderStats(){
-    const p = getCurrentProfile();
-    const subjStats = p.subjects[$('#subject').value];
-    $('#subjectScore').textContent=subjStats.subjectScore||0;
-    updateTodayKpis();
-  }
-  function getCurrentProfile(){
-    return app.profiles.find(p=>p.id===app.currentProfileId);
-  }
-
-  // ---------- Question Generators ----------
-  function uniqueKeyGuard(profile, subject, key){
-    const s = profile.subjects[subject];
-    if(s.unique.has(key)) return false;
-    s.unique.add(key);
-    if(s.unique.size>200){
-      const arr = Array.from(s.unique);
-      s.unique = new Set(arr.slice(arr.length-200));
-    }
-    return true;
-  }
-
-  const Generators = {
-    Matematica(level){
-      const enabled = $$('.mathop:checked').map(i=>i.value);
-      const op = pick(enabled.length?enabled:['add','sub','mul','div']);
-      const ranges = {easy:[1,10], medium:[5,20], hard:[10,50]};
-      const [a,b] = (()=>{
-        const [min,max]=ranges[level];
-        if(op==='div'){
-          const divisor = rand(min, Math.max(min,Math.floor(max/2)));
-          const quotient = rand(min, max>=30?10:max);
-          return [divisor*quotient, divisor];
+    <script>
+    (function(){
+        // ---------- Utilities ----------
+        const $ = sel => document.querySelector(sel);
+        const $$ = sel => Array.from(document.querySelectorAll(sel));
+        const todayStr = () => new Date().toISOString().slice(0,10);
+        const weekOf = (d=new Date()) => {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const day = date.getUTCDay() || 7;
+            date.setUTCDate(date.getUTCDate() + 4 - day);
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+            const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+            return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
         }
-        return [rand(min,max), rand(min,max)];
-      })();
-      const text = {add:`${a} + ${b} = ?`, sub:`${a} − ${b} = ?`, mul:`${a} × ${b} = ?`, div:`${a} ÷ ${b} = ?`}[op];
-      const answer = {add:a+b, sub:a-b, mul:a*b, div:Math.floor(a/b)}[op];
-      const key = `M:${level}:${op}:${a}:${b}`;
-      return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key),
-               q:text,
-               options: makeNumberOptions(answer, level),
-               correct: String(answer),
-               hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`,
-               explain: `Ricorda le regole di ${op}: la ${op==='add'?'somma':op==='sub'?'sottrazione':op==='mul'?'moltiplicazione':'divisione'} tra due numeri.`,
-               flashcard: `1️⃣ Scrivi il primo numero.<br>2️⃣ Esegui l'operazione.<br>3️⃣ Scrivi il risultato.` };
-    },
-    Inglese(level){
-      const wordsEasy = [['cat','gatto'],['dog','cane'],['house','casa'],['sun','sole'],['book','libro'],['car','auto'],['apple','mela'],['ball','palla'],['tree','albero'],['bird','uccello']];
-      const wordsMed = [['family','famiglia'],['friend','amico'],['beautiful','bello'],['together','insieme'],['happy','felice'],['water','acqua'],['food','cibo'],['school','scuola'],['teacher','insegnante'],['student','studente']];
-      const wordsHard = [['thought','pensiero'],['tomorrow','domani'],['usually','di solito'],['question','domanda'],['answer','risposta'],['develop','sviluppare'],['community','comunità'],['knowledge','conoscenza'],['important','importante'],['different','diverso']];
-      const bank = level==='easy'?wordsEasy:level==='medium'?wordsMed:wordsHard;
-      const [en,it] = pick(bank);
-      const mode = pick(['it->en','en->it']);
-      let q,correct,opts,hint,explain,flashcard;
-      if(mode==='it->en'){
-        q = `Traduci in inglese: “${it}”`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0]));
-        hint = `Pensa alla parola inglese che hai imparato per “${it}”.`;
-        explain = `Ricorda i suoni e le lettere delle parole inglesi.`;
-        flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`;
-      } else {
-        q = `Cosa vuol dire in italiano: “${en}”?`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1]));
-        hint = `Prova a ricordare il significato in italiano di "${en}".`;
-        explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`;
-        flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`;
-      }
-      const key = `E:${level}:${en}:${mode}`;
-      return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard };
-    },
-    Italiano(level){
-      const modes = ['articolo','vocale','plurale','aggettivo'];
-      const mode = pick(modes);
-      if(mode==='articolo'){
-        const nouns=[['___ albero','l\''],['___ zaino','lo '],['___ scuola','la '],['___ ombrello','l\''],['___ gatto','il '],['___ tigre','la ']];
-        const [phrase, art] = pick(nouns);
-        const opts = makeTextOptions(art.trim(), ['il','lo','la','l\'']);
-        return pack('Completa con la parolina giusta: '+phrase, art.trim(), opts, 'Guarda la prima lettera della parola dopo.','Ricorda le regole per usare gli articoli determinativi.','L\'articolo determinativo accompagna il nome e indica se l\'elemento è già conosciuto o no.');
-      }
-      if(mode==='vocale'){
-        const letter = pick('aeiou'.split(''));
-        const opts = makeTextOptions('vocale',['vocale','consonante']);
-        return pack(`La letterina "${letter}" è una…`, 'vocale', opts, 'Quando pronunci il suono, l\'aria esce libera dalla bocca.', 'Le vocali sono A, E, I, O, U.');
-      }
-      if(mode==='plurale'){
-        const words=[['libro','libri'],['mela','mele'],['amico','amici'],['palla','palle'],['fiore','fiori']];
-        const [sing,plu]=pick(words);
-        const q=`Qual è il plurale di "${sing}"?`;
-        const opts = makeTextOptions(plu, words.map(x=>x[1]));
-        return pack(q,plu,opts,'Cambia l\'ultima letterina della parola.','Ricorda come si forma il plurale di nomi comuni.','Se il nome singolare finisce con -o, il plurale è -i. Se finisce con -a, il plurale è -e.');
-      }
-      if(mode==='aggettivo'){
-        const adjectives=[['alto','alta','alti','alte'],['bello','bella','belli','belle'],['rosso','rossa','rossi','rosse']];
-        const [m_s, f_s, m_p, f_p] = pick(adjectives);
-        const choice = pick(['m_s','f_s','m_p','f_p']);
-        let q, correct;
-        if(choice === 'm_s'){q=`Qual è il femminile di "${m_s}"?`; correct=f_s;}
-        if(choice === 'f_s'){q=`Qual è il plurale maschile di "${f_s}"?`; correct=m_p;}
-        if(choice === 'm_p'){q=`Qual è il singolare di "${m_p}"?`; correct=m_s;}
-        if(choice === 'f_p'){q=`Qual è il singolare femminile di "${f_p}"?`; correct=f_s;}
-        const opts = makeTextOptions(correct, [m_s, f_s, m_p, f_p]);
-        return pack(q,correct,opts,'Pensa a come l\'aggettivo cambia a seconda del genere e del numero.','Gli aggettivi concordano in genere e numero con il nome a cui si riferiscono.','Ricorda le desinenze: -o/-a per il singolare, -i/-e per il plurale.');
-      }
-      
-      function pack(q,correct,options,hint,explain,flashcard){
-        const key=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',key),q,correct,options,hint,explain,flashcard};
-      }
-    },
-    Geografia(level){
-      const capitals = {
-        Europa:[['Italia','Roma'],['Francia','Parigi'],['Spagna','Madrid'],['Germania','Berlino'],['Regno Unito','Londra'],['Svezia','Stoccolma'],['Norvegia','Oslo'],['Finlandia','Helsinki']],
-        Mondo:[['Giappone','Tokyo'],['USA','Washington'],['Brasile','Brasilia'],['Australia','Canberra'],['Cina','Pechino'],['Egitto','Il Cairo'],['Canada','Ottawa'],['Messico','Città del Messico']]
-      }
-      const pool = level==='easy'?capitals.Europa:capitals.Mondo;
-      const [country,cap] = pick(pool);
-      const q=`Qual è la città principale di ${country}?`;
-      const opts = makeTextOptions(cap, pool.map(x=>x[1]));
-      const key=`G:${level}:${country}`;
-      return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più famosa e importante di quel paese.', explain:`Ricorda la capitale di ${country}.`, flashcard:`Paese → Capitale\nRipassa le capitali dei paesi del mondo.`};
-    },
-    Scienze(level){
-      const mode = pick(['stato','animali','corpo','piante']);
-      if(mode==='stato'){
-        const items=[['ghiaccio','solido'],['acqua','liquido'],['vapore','gas']];
-        const [mat,st]=pick(items);
-        const q=`Lo stato fisico del "${mat}" è…`;
-        const opts=makeTextOptions(st,['solido','liquido','gas']);
-        return pack(q,st,opts,'Pensa a se ha una forma e un volume definiti.','Ricorda le caratteristiche dei tre stati della materia.','Stati: solido (forma fissa), liquido (scorre), gas (si espande).');
-      }
-      if(mode==='animali'){
-        const items=[['delfino','mammifero'],['aquila','uccello'],['trota','pesce']];
-        const [ani,cl]=pick(items);
-        const opts=makeTextOptions(cl,['mammifero','uccello','pesce','anfibio']);
-        return pack(`Il ${ani} è un…`,cl,opts,'Pensa a come si riproduce e come respira.','Ricorda le caratteristiche delle diverse classi di animali.','Classificazioni: mammifero, uccello, pesce, anfibio, rettile.');
-      }
-      if(mode==='corpo'){
-        const items=[['Il cuore','pompa il sangue'],['I polmoni','servono per respirare'],['Lo stomaco','aiuta la digestione'],['Il cervello','ci fa pensare']];
-        const [org,fun]=pick(items);
-        const q=`A cosa serve: ${org}?`;
-        const opts=makeTextOptions(fun, items.map(x=>x[1]));
-        return pack(q,fun,opts,'È un organo, che funzione ha?','Ogni organo del corpo ha una funzione specifica.','Funzioni del corpo: pompare il sangue, respirare, digerire.');
-      }
-      if(mode==='piante'){
-        const items=[['radici','ancorare la pianta'],['foglie','fare la fotosintesi'],['fiori','riprodursi']];
-        const [parte,fun]=pick(items);
-        const q=`A cosa serve questa parte della pianta: ${parte}?`;
-        const opts=makeTextOptions(fun, items.map(x=>x[1]));
-        return pack(q,fun,opts,'Pensa a cosa fa quella parte della pianta per aiutarla a vivere.','Ricorda le funzioni delle parti di una pianta.','Parti della pianta: radici (ancorano), foglie (fotosintesi), fusto (sostiene), fiori (riproduzione).');
-      }
+        const rand = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+        const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+        const pick = arr => arr[rand(0,arr.length-1)];
 
-      function pack(q,correct,options,hint,explain,flashcard){
-        const key=`S:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Scienze',key),q,correct,options,hint,explain,flashcard};
-      }
-    },
-    Musica(level){
-      const mode = pick(['famiglia','ritmo','note']);
-      if(mode==='famiglia'){
-        const items=[['violino','archi'],['flauto','fiati'],['tromba','ottoni'],['chitarra','corde']];
-        const [inst,fam]=pick(items);
-        const q=`A quale famiglia appartiene il ${inst}?`;
-        const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']);
-        return pack(q,fam,opts,'Pensa a come si produce il suono.','Ricorda come si raggruppano gli strumenti musicali.','Famiglie: archi (con archetto), fiati (si soffia), ottoni (si soffia in una canna di metallo), percussioni (si batte).');
-      }
-      if(mode==='ritmo'){
-        const items=[['Una semibreve vale','4 battiti'],['Una minima vale','2 battiti'],['Una semiminima vale','1 battito']];
-        const [note,val]=pick(items);
-        const q = `Una nota che vale ${val} si chiama…`;
-        const opts=makeTextOptions(note,['semibreve','minima','semiminima']);
-        return pack(q,note,opts,'Pensa al nome della nota e a quanto vale.','Ripassa i nomi delle note e la loro durata.','Durate: Semibreve (4), Minima (2), Semiminima (1).');
-      }
-      if(mode==='note'){
-        const items=[['do','re','mi','fa','sol','la','si']];
-        const [note1,note2]=pick(items);
-        const q = `Quale nota viene dopo "${note1}"?`;
-        const opts=makeTextOptions(note2, items.flat());
-        return pack(q,note2,opts,'Pensa all\'ordine delle note musicali.','Ricorda la scala musicale.','La scala musicale va in ordine: do, re, mi, fa, sol, la, si.');
-      }
-      function pack(q,correct,options,hint,explain,flashcard){
-        const key=`Mu:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Musica',key),q,correct,options,hint,explain,flashcard};
-      }
-    }
-  };
+        // ---------- Storage ----------
+        const STORAGE_KEY = 'kids_learner_v2';
+        const defaultSubjects = ['Matematica','Inglese','Italiano','Geografia','Scienze','Musica'];
+        const baseStats = ()=>({weeklyScore:0, subjectScore:0, today:{}, unique:new Set(), uniqueArr:[], completedToday:0});
 
-  function makeNumberOptions(answer, level){
-    const spread = level==='easy'?3:level==='medium'?7:12;
-    const set = new Set([String(answer)]);
-    while(set.size<4){ set.add(String(answer + rand(-spread,spread))); }
-    return shuffle(Array.from(set));
-  }
-  function makeTextOptions(correct, pool){
-    const set = new Set([correct]);
-    const shuffled = shuffle(pool).slice(0,10);
-    for(const x of shuffled){ if(set.size>=4) break; if(x!==correct) set.add(x); }
-    while(set.size<4){ set.add(correct + String.fromCharCode(97+rand(0,25))); }
-    return shuffle(Array.from(set));
-  }
+        function load(){
+            let data = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+            if(!data || data.version !== 2){
+                const id = cryptoRandomId();
+                const now = new Date();
+                data = {version:2, currentProfileId:id, week:weekOf(now), profiles:[{id,name:'Bimbo',created:now.toISOString(), subjects:objFromArray(defaultSubjects,()=>baseStats())}]};
+                save(data);
+            }
+            data.profiles.forEach(p=>{
+                for(const s of defaultSubjects){
+                    const subj=p.subjects[s];
+                    if(subj && !subj.unique){subj.unique=new Set();}
+                    if(subj && subj.uniqueArr){subj.unique=new Set(subj.uniqueArr);}
+                }
+            });
+            const w=weekOf();
+            if(data.week!==w){
+                data.week=w;
+                data.profiles.forEach(p=>{
+                    defaultSubjects.forEach(s=>{
+                        p.subjects[s].weeklyScore=0;
+                        p.subjects[s].completedToday=0;
+                    });
+                });
+                save(data);
+            }
+            return data;
+        }
 
-  function pickGenerator(){
-    const subj = $('#subject').value;
-    const level = $('#level').value;
-    return ()=>Generators[subj](level);
-  }
+        function save(data){
+            const clone = JSON.parse(JSON.stringify(data));
+            clone.profiles.forEach(p=>{
+                defaultSubjects.forEach(s=>{
+                    const subj = p.subjects[s];
+                    subj.uniqueArr = Array.from(p.subjects[s].unique||[]);
+                    delete subj.unique;
+                });
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(clone));
+        }
 
-  // ---------- Scoring & Progress ----------
-  const POINTS = {easy:10, medium:15, hard:20};
-  function recordResult(correct){
-    const profile = getCurrentProfile();
-    const subj = $('#subject').value;
-    const lvl = $('#level').value;
-    const date=todayStr();
-    const pts = correct?POINTS[lvl]:0;
-    const subjStats = profile.subjects[subj];
-    subjStats.subjectScore += pts;
-    subjStats.weeklyScore += pts;
-    subjStats.completedToday = (subjStats.completedToday||0) + 1;
-    subjStats.today[date] = subjStats.today[date] || {score:0, completed:0};
-    subjStats.today[date].score += pts;
-    subjStats.today[date].completed += 1;
-    save(app);
-    updateTodayKpis();
-    $('#subjectScore').textContent=subjStats.subjectScore;
-  }
-  function updateTodayKpis(){
-    const p=getCurrentProfile();
-    const date=todayStr();
-    let totalScore=0, totalCount=0;
-    defaultSubjects.forEach(s=>{
-      const d=p.subjects[s].today[date];
-      if(d){ totalScore+=d.score; totalCount+=d.completed; }
-    });
-    $('#todayScore').textContent=totalScore;
-    $('#todayCount').textContent=totalCount;
-  }
+        function cryptoRandomId(){
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c=>(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c/4).toString(16));
+        }
+        function objFromArray(arr,fn){ const o={}; arr.forEach(k=>o[k]=fn()); return o; }
 
-  // ---------- Session flow ----------
-  function startSession(){
-    session = { running:true, size:parseInt($('#sessionSize').value,10), index:0, correct:0, current:null };
-    $('#progressBar').style.width='0%';
-    nextQuestion();
-  }
-  function nextQuestion(){
-    const gen = pickGenerator();
-    const profile=getCurrentProfile();
-    let attempt=0; let pak;
-    do{ pak = gen(); attempt++; if(attempt>50) {
-      pak={q:'Non ci sono più domande uniche per questa materia e livello!',options:[],correct:''};
-      session.running=false;
-      }
-    } while(!pak.ok(profile));
-    session.current = pak;
-    
-    $('#question').innerHTML = pak.q;
-    const ops = $('#options');
-    ops.innerHTML='';
-    pak.options.forEach(opt=>{
-      const b=document.createElement('div');
-      b.className='option rounded-xl cursor-pointer hover:bg-sky-200';
-      b.textContent=opt;
-      b.tabIndex=0;
-      b.addEventListener('click',()=>selectAnswer(b,opt));
-      ops.appendChild(b);
-    });
-    $('#helpBox').innerHTML='Premi i bottoni per un aiuto!';
-    $('#feedback').textContent='';
-    updateHeaderStats();
-  }
-  function selectAnswer(el, value){
-    if(!session.running||!session.current) return;
-    const correct = String(value).trim().toLowerCase()===String(session.current.correct).trim().toLowerCase();
-    $$('#options .option').forEach(o=>o.style.pointerEvents='none');
-    el.classList.add(correct?'correct':'wrong');
-    $('#feedback').innerHTML = correct?`🥳 Bravissimo! Hai guadagnato +${POINTS[$('#level').value]} punti!`:`😢 Ops! La risposta giusta era: <b>${session.current.correct}</b>.`;
-    recordResult(correct);
-    setTimeout(()=>{
-      session.index++;
-      const pct = Math.min(100, Math.round((session.index/session.size)*100));
-      $('#progressBar').style.width = pct+'%';
-      if(session.index>=session.size){
-        session.running=false;
-        $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
-        $('#options').innerHTML='';
-        $('#feedback').textContent='';
-      } else {
-        nextQuestion();
-      }
-    }, 1500);
-  }
+        // ---------- State ----------
+        let app = load();
+        let session = { running:false, size:10, index:0, correct:0, current:null };
 
-  // ---------- Buttons: help / flash / explain ----------
-  $('#hintBtn').addEventListener('click',()=>{
-    if(session.current) $('#helpBox').innerHTML = '💡 <b>Aiuto:</b> '+session.current.hint;
-  });
-  $('#explainBtn').addEventListener('click',()=>{
-    if(session.current) $('#helpBox').innerHTML = '📖 <b>Spiegazione:</b> '+session.current.explain;
-  });
-  $('#flashBtn').addEventListener('click',()=>{
-    if(session.current) $('#helpBox').innerHTML = '🃏 <b>Flashcard:</b><br>'+session.current.flashcard;
-  });
+        // ---------- UI init ----------
+        function initProfiles(){
+            const sel = $('#profileSelect');
+            sel.innerHTML='';
+            app.profiles.forEach(p=>{ const opt=document.createElement('option'); opt.value=p.id;opt.textContent=p.name;sel.appendChild(opt); });
+            sel.value=app.currentProfileId;
+            updateHeaderStats();
+        }
+        function updateHeaderStats(){
+            const p = getCurrentProfile();
+            const subjStats = p.subjects[$('#subject').value];
+            $('#subjectScore').textContent=subjStats.subjectScore||0;
+            updateTodayKpis();
+        }
+        function getCurrentProfile(){
+            return app.profiles.find(p=>p.id===app.currentProfileId);
+        }
 
-  // ---------- Events ----------
-  $('#startBtn').addEventListener('click', startSession);
-  $('#subject').addEventListener('change',()=>{
-    const subj=$('#subject').value;
-    $('#mathOpsWrap').classList.toggle('hidden', subj!=='Matematica');
-    updateHeaderStats();
-  });
-  $('#level').addEventListener('change', updateHeaderStats);
+        // ---------- Question Generators ----------
+        function uniqueKeyGuard(profile, subject, key){
+            const s = profile.subjects[subject];
+            if(s.unique.has(key)) return false;
+            s.unique.add(key);
+            if(s.unique.size>200){
+                const arr = Array.from(s.unique);
+                s.unique = new Set(arr.slice(arr.length-200));
+            }
+            return true;
+        }
 
-  $('#addProfileBtn').addEventListener('click',()=>{
-    const name = ($('#newProfileName').value||'').trim();
-    if(!name) { alert('Per favore, scrivi il nome del nuovo amico!'); return; }
-    const id=cryptoRandomId();
-    app.profiles.push({id,name,created:new Date().toISOString(), subjects:objFromArray(defaultSubjects,()=>baseStats())});
-    app.currentProfileId=id; save(app); initProfiles(); $('#newProfileName').value='';
-  });
-  $('#profileSelect').addEventListener('change', (e)=>{
-    app.currentProfileId=e.target.value; save(app); updateHeaderStats();
-  });
+        const Generators = {
+            Matematica(level){
+                const enabled = $$('.mathop:checked').map(i=>i.value);
+                const op = pick(enabled.length?enabled:['add','sub','mul','div']);
+                const ranges = {easy:[1,10], medium:[5,20], hard:[10,50]};
+                const [a,b] = (()=>{
+                    const [min,max]=ranges[level];
+                    if(op==='div'){
+                        const divisor = rand(min, Math.max(min,Math.floor(max/2)));
+                        const quotient = rand(min, max>=30?10:max);
+                        return [divisor*quotient, divisor];
+                    }
+                    return [rand(min,max), rand(min,max)];
+                })();
+                const text = {add:`${a} + ${b} = ?`, sub:`${a} − ${b} = ?`, mul:`${a} × ${b} = ?`, div:`${a} ÷ ${b} = ?`}[op];
+                const answer = {add:a+b, sub:a-b, mul:a*b, div:Math.floor(a/b)}[op];
+                const key = `M:${level}:${op}:${a}:${b}`;
+                return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key), q:text, options: makeNumberOptions(answer, level), correct: String(answer), hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`, explain: `Ricorda le regole di ${op}: la ${op==='add'?'somma':op==='sub'?'sottrazione':op==='mul'?'moltiplicazione':'divisione'} tra due numeri.`, flashcard: `1️⃣ Scrivi il primo numero.<br>2️⃣ Esegui l'operazione.<br>3️⃣ Scrivi il risultato.` };
+            },
+            Inglese(level){
+                const wordsEasy = [['cat','gatto'],['dog','cane'],['house','casa'],['sun','sole'],['book','libro'],['car','auto'],['apple','mela'],['ball','palla'],['tree','albero'],['bird','uccello']];
+                const wordsMed = [['family','famiglia'],['friend','amico'],['beautiful','bello'],['together','insieme'],['happy','felice'],['water','acqua'],['food','cibo'],['school','scuola'],['teacher','insegnante'],['student','studente']];
+                const wordsHard = [['thought','pensiero'],['tomorrow','domani'],['usually','di solito'],['question','domanda'],['answer','risposta'],['develop','sviluppare'],['community','comunità'],['knowledge','conoscenza'],['important','importante'],['different','diverso']];
+                const bank = level==='easy'?wordsEasy:level==='medium'?wordsMed:wordsHard;
+                const [en,it] = pick(bank);
+                const mode = pick(['it->en','en->it']);
+                let q,correct,opts,hint,explain,flashcard;
+                if(mode==='it->en'){
+                    q = `Traduci in inglese: “${it}”`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0]));
+                    hint = `Pensa alla parola inglese che hai imparato per “${it}”`;
+                    explain = `Ricorda i suoni e le lettere delle parole inglesi.`;
+                    flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`;
+                } else {
+                    q = `Cosa vuol dire in italiano: “${en}”`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1]));
+                    hint = `Prova a ricordare il significato in italiano di "${en}".`;
+                    explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`;
+                    flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`;
+                }
+                const key = `E:${level}:${en}:${mode}`;
+                return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard };
+            },
+            Italiano(level){
+                const modes = ['articolo','vocale','plurale','aggettivo'];
+                const mode = pick(modes);
+                if(mode==='articolo'){
+                    const nouns=[['___ albero','l\''],['___ zaino','lo '],['___ scuola','la '],['___ ombrello','l\''],['___ gatto','il '],['___ tigre','la ']];
+                    const [phrase, art] = pick(nouns);
+                    const opts = makeTextOptions(art.trim(), ['il','lo','la','l\'']);
+                    return pack('Completa con la parolina giusta: '+phrase, art.trim(), opts, 'Guarda la prima lettera della parola dopo.','Ricorda le regole per usare gli articoli determinativi.','L\'articolo determinativo accompagna il nome e indica se l\'elemento è già conosciuto o no.');
+                }
+                if(mode==='vocale'){
+                    const letter = pick('aeiou'.split(''));
+                    const opts = makeTextOptions('vocale',['vocale','consonante']);
+                    return pack(`La letterina "${letter}" è una…`, 'vocale', opts, 'Quando pronunci il suono, l\'aria esce libera dalla bocca.', 'Le vocali sono A, E, I, O, U.');
+                }
+                if(mode==='plurale'){
+                    const words=[['libro','libri'],['mela','mele'],['amico','amici'],['palla','palle'],['fiore','fiori']];
+                    const [sing,plu]=pick(words);
+                    const q=`Qual è il plurale di "${sing}"?`;
+                    const opts = makeTextOptions(plu, words.map(x=>x[1]));
+                    return pack(q,plu,opts,'Cambia l\'ultima letterina della parola.','Ricorda come si forma il plurale di nomi comuni.','Se il nome singolare finisce con -o, il plurale è -i. Se finisce con -a, il plurale è -e.');
+                }
+                if(mode==='aggettivo'){
+                    const adjectives=[['alto','alta','alti','alte'],['bello','bella','belli','belle'],['rosso','rossa','rossi','rosse']];
+                    const [m_s, f_s, m_p, f_p] = pick(adjectives);
+                    const choice = pick(['m_s','f_s','m_p','f_p']);
+                    let q, correct;
+                    if(choice === 'm_s'){q=`Qual è il femminile di "${m_s}"?`; correct=f_s;}
+                    if(choice === 'f_s'){q=`Qual è il plurale maschile di "${f_s}"?`; correct=m_p;}
+                    if(choice === 'm_p'){q=`Qual è il singolare di "${m_p}"?`; correct=m_s;}
+                    if(choice === 'f_p'){q=`Qual è il singolare femminile di "${f_p}"?`; correct=f_s;}
+                    const opts = makeTextOptions(correct, [m_s, f_s, m_p, f_p]);
+                    return pack(q,correct,opts,'Pensa a come l\'aggettivo cambia a seconda del genere e del numero.','Gli aggettivi concordano in genere e numero con il nome a cui si riferiscono.','Ricorda le desinenze: -o/-a per il singolare, -i/-e per il plurale.');
+                }
+                function pack(q,correct,options,hint,explain,flashcard){const key=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',key),q,correct,options,hint,explain,flashcard};}
+            },
+            Geografia(level){
+                const capitals = {
+                    Europa:[['Italia','Roma'],['Francia','Parigi'],['Spagna','Madrid'],['Germania','Berlino'],['Regno Unito','Londra'],['Svezia','Stoccolma'],['Norvegia','Oslo'],['Finlandia','Helsinki']],
+                    Mondo:[['Giappone','Tokyo'],['USA','Washington'],['Brasile','Brasilia'],['Australia','Canberra'],['Cina','Pechino'],['Egitto','Il Cairo'],['Canada','Ottawa'],['Messico','Città del Messico']]
+                }
+                const pool = level==='easy'?capitals.Europa:capitals.Mondo;
+                const [country,cap] = pick(pool);
+                const q=`Qual è la città principale di ${country}?`;
+                const opts = makeTextOptions(cap, pool.map(x=>x[1]));
+                const key=`G:${level}:${country}`;
+                return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più famosa e importante di quel paese.', explain:`Ricorda la capitale di ${country}.`, flashcard:`Paese → Capitale\nRipassa le capitali dei paesi del mondo.`};
+            },
+            Scienze(level){
+                const mode = pick(['stato','animali','corpo','piante']);
+                if(mode==='stato'){
+                    const items=[['ghiaccio','solido'],['acqua','liquido'],['vapore','gas']];
+                    const [mat,st]=pick(items);
+                    const q=`Lo stato fisico del "${mat}" è…`;
+                    const opts=makeTextOptions(st,['solido','liquido','gas']);
+                    return pack(q,st,opts,'Pensa a se ha una forma e un volume definiti.','Ricorda le caratteristiche dei tre stati della materia.','Stati: solido (forma fissa), liquido (scorre), gas (si espande).');
+                }
+                if(mode==='animali'){
+                    const items=[['delfino','mammifero'],['aquila','uccello'],['trota','pesce']];
+                    const [ani,cl]=pick(items);
+                    const opts=makeTextOptions(cl,['mammifero','uccello','pesce','anfibio']);
+                    return pack(`Il ${ani} è un…`,cl,opts,'Pensa a come si riproduce e come respira.','Ricorda le caratteristiche delle diverse classi di animali.','Classificazioni: mammifero, uccello, pesce, anfibio, rettile.');
+                }
+                if(mode==='corpo'){
+                    const items=[['Il cuore','pompa il sangue'],['I polmoni','servono per respirare'],['Lo stomaco','aiuta la digestione'],['Il cervello','ci fa pensare']];
+                    const [org,fun]=pick(items);
+                    const q=`A cosa serve: ${org}?`;
+                    const opts=makeTextOptions(fun, items.map(x=>x[1]));
+                    return pack(q,fun,opts,'È un organo, che funzione ha?','Ogni organo del corpo ha una funzione specifica.','Funzioni del corpo: pompare il sangue, respirare, digerire.');
+                }
+                if(mode==='piante'){
+                    const items=[['radici','ancorare la pianta'],['foglie','fare la fotosintesi'],['fiori','riprodursi']];
+                    const [parte,fun]=pick(items);
+                    const q=`A cosa serve questa parte della pianta: ${parte}?`;
+                    const opts=makeTextOptions(fun, items.map(x=>x[1]));
+                    return pack(q,fun,opts,'Pensa a cosa fa quella parte della pianta per aiutarla a vivere.','Ricorda le funzioni delle parti di una pianta.','Parti della pianta: radici (ancorano), foglie (fotosintesi), fusto (sostiene), fiori (riproduzione).');
+                }
+                function pack(q,correct,options,hint,explain,flashcard){const key=`S:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Scienze',key),q,correct,options,hint,explain,flashcard};}
+            },
+            Musica(level){
+                const mode = pick(['famiglia','ritmo','note']);
+                if(mode==='famiglia'){
+                    const items=[['violino','archi'],['flauto','fiati'],['tromba','ottoni'],['chitarra','corde']];
+                    const [inst,fam]=pick(items);
+                    const q=`A quale famiglia appartiene il ${inst}?`;
+                    const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']);
+                    return pack(q,fam,opts,'Pensa a come si produce il suono.','Ricorda come si raggruppano gli strumenti musicali.','Famiglie: archi (con archetto), fiati (si soffia), ottoni (si soffia in una canna di metallo), percussioni (si batte).');
+                }
+                if(mode==='ritmo'){
+                    const items=[['Una semibreve vale','4 battiti'],['Una minima vale','2 battiti'],['Una semiminima vale','1 battito']];
+                    const [note,val]=pick(items);
+                    const q = `Una nota che vale ${val} si chiama…`;
+                    const opts=makeTextOptions(note,['semibreve','minima','semiminima']);
+                    return pack(q,note,opts,'Pensa al nome della nota e a quanto vale.','Ripassa i nomi delle note e la loro durata.','Durate: Semibreve (4), Minima (2), Semiminima (1).');
+                }
+                if(mode==='note'){
+                    const items=[['do','re','mi','fa','sol','la','si']];
+                    const [note1,note2]=pick(items);
+                    const q = `Quale nota viene dopo "${note1}"?`;
+                    const opts=makeTextOptions(note2, items.flat());
+                    return pack(q,note2,opts,'Pensa all\'ordine delle note musicali.','Ricorda la scala musicale.','La scala musicale va in ordine: do, re, mi, fa, sol, la, si.');
+                }
+                function pack(q,correct,options,hint,explain,flashcard){const key=`Mu:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Musica',key),q,correct,options,hint,explain,flashcard};}
+            }
+        };
 
-  // Progress dialog
-  $('#progressBtn').addEventListener('click',()=>{
-    const p=getCurrentProfile();
-    const date=todayStr();
-    let html='';
-    let totalScore=0,totalCompleted=0;
-    defaultSubjects.forEach(s=>{
-      const d=p.subjects[s].today[date];
-      const sc=d?d.score:0; const ct=d?d.completed:0;
-      totalScore+=sc; totalCompleted+=ct;
-      html+=`<div class=\"bg-white rounded-xl p-3 my-2 text-xl shadow-inner\">${s}: <b>${ct}</b> attività • <b>${sc}</b> punti</div>`;
-    });
-    html+=`<div class=\"bg-sky-200 rounded-xl p-4 mt-4 text-xl font-bold shadow-md\">Totale oggi: <b>${totalCompleted}</b> attività • <b>${totalScore}</b> punti</div>`;
-    $('#progressSummary').innerHTML=html;
-    $('#progressDialog').showModal();
-  });
+        function makeNumberOptions(answer, level){
+            const spread = level==='easy'?3:level==='medium'?7:12;
+            const set = new Set([String(answer)]);
+            while(set.size<4){ set.add(String(answer + rand(-spread,spread))); }
+            return shuffle(Array.from(set));
+        }
+        function makeTextOptions(correct, pool){
+            const set = new Set([correct]);
+            const shuffled = shuffle(pool).slice(0,10);
+            for(const x of shuffled){
+                if(set.size>=4) break;
+                if(x!==correct) set.add(x);
+            }
+            while(set.size<4){ set.add(correct + String.fromCharCode(97+rand(0,25))); }
+            return shuffle(Array.from(set));
+        }
+        function pickGenerator(){
+            const subj = $('#subject').value;
+            const level = $('#level').value;
+            return ()=>Generators[subj](level);
+        }
 
-  // ---------- Boot ----------
-  initProfiles();
-  $('#mathOpsWrap').classList.toggle('hidden', $('#subject').value!=='Matematica');
-})();
-</script>
+        // ---------- Scoring & Progress ----------
+        const POINTS = {easy:10, medium:15, hard:20};
+
+        function recordResult(correct){
+            const profile = getCurrentProfile();
+            const subj = $('#subject').value;
+            const lvl = $('#level').value;
+            const date=todayStr();
+            const pts = correct?POINTS[lvl]:0;
+            const subjStats = profile.subjects[subj];
+            subjStats.subjectScore += pts;
+            subjStats.weeklyScore += pts;
+            subjStats.completedToday = (subjStats.completedToday||0) + 1;
+            subjStats.today[date] = subjStats.today[date] || {score:0, completed:0};
+            subjStats.today[date].score += pts;
+            subjStats.today[date].completed += 1;
+            save(app);
+            updateTodayKpis();
+            $('#subjectScore').textContent=subjStats.subjectScore;
+        }
+
+        function updateTodayKpis(){
+            const p=getCurrentProfile();
+            const date=todayStr();
+            let totalScore=0, totalCount=0;
+            defaultSubjects.forEach(s=>{
+                const d=p.subjects[s].today[date];
+                if(d){ totalScore+=d.score; totalCount+=d.completed; }
+            });
+            $('#todayScore').textContent=totalScore;
+            $('#todayCount').textContent=totalCount;
+        }
+
+        // ---------- Session flow ----------
+        function startSession(){
+            session = { running:true, size:parseInt($('#sessionSize').value,10), index:0, correct:0, current:null };
+            $('#progressBar').style.width='0%';
+            nextQuestion();
+        }
+
+        function nextQuestion(){
+            const gen = pickGenerator();
+            const profile=getCurrentProfile();
+            let attempt=0; let pak;
+            do{
+                pak = gen();
+                attempt++;
+                if(attempt>50) {
+                    pak={q:'Non ci sono più domande uniche per questa materia e livello!',options:[],correct:''};
+                    session.running=false;
+                }
+            } while(!pak.ok(profile));
+
+            session.current = pak;
+            $('#question').innerHTML = pak.q;
+            const ops = $('#options');
+            ops.innerHTML='';
+            pak.options.forEach(opt=>{
+                const b=document.createElement('div');
+                b.className='option rounded-xl cursor-pointer hover:bg-sky-200';
+                b.textContent=opt;
+                b.tabIndex=0;
+                b.addEventListener('click',()=>selectAnswer(b,opt));
+                ops.appendChild(b);
+            });
+            $('#helpBox').innerHTML='Premi i bottoni per un aiuto!';
+            $('#feedback').textContent='';
+            updateHeaderStats();
+        }
+
+        function selectAnswer(el, value){
+            if(!session.running||!session.current) return;
+            const correct = String(value).trim().toLowerCase()===String(session.current.correct).trim().toLowerCase();
+            $$('#options .option').forEach(o=>o.style.pointerEvents='none');
+            el.classList.add(correct?'correct':'wrong');
+            $('#feedback').innerHTML = correct?`🥳 Bravissimo! Hai guadagnato +${POINTS[$('#level').value]} punti!`:`😢 Ops! La risposta giusta era: <b>${session.current.correct}</b>.`;
+            recordResult(correct);
+
+            setTimeout(()=>{
+                session.index++;
+                const pct = Math.min(100, Math.round((session.index/session.size)*100));
+                $('#progressBar').style.width = pct+'%';
+                if(session.index>=session.size){
+                    session.running=false;
+                    $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
+                    $('#options').innerHTML='';
+                    $('#feedback').textContent='';
+                } else {
+                    nextQuestion();
+                }
+            }, 1500);
+        }
+
+        // ---------- Buttons: help / flash / explain ----------
+        $('#hintBtn').addEventListener('click',()=>{
+            if(session.current) $('#helpBox').innerHTML = '💡 <b>Aiuto:</b> '+session.current.hint;
+        });
+        $('#explainBtn').addEventListener('click',()=>{
+            if(session.current) $('#helpBox').innerHTML = '📖 <b>Spiegazione:</b> '+session.current.explain;
+        });
+        $('#flashBtn').addEventListener('click',()=>{
+            if(session.current) $('#helpBox').innerHTML = '🃏 <b>Flashcard:</b><br>'+session.current.flashcard;
+        });
+
+        // ---------- Events ----------
+        $('#startBtn').addEventListener('click', startSession);
+        $('#subject').addEventListener('change',()=>{
+            const subj=$('#subject').value;
+            $('#mathOpsWrap').classList.toggle('hidden', subj!=='Matematica');
+            updateHeaderStats();
+        });
+        $('#level').addEventListener('change', updateHeaderStats);
+        $('#addProfileBtn').addEventListener('click',()=>{
+            const name = ($('#newProfileName').value||'').trim();
+            if(!name) { alert('Per favore, scrivi il nome del nuovo amico!'); return; }
+            const id=cryptoRandomId();
+            app.profiles.push({id,name,created:new Date().toISOString(), subjects:objFromArray(defaultSubjects,()=>baseStats())});
+            app.currentProfileId=id;
+            save(app);
+            initProfiles();
+            $('#newProfileName').value='';
+        });
+        $('#profileSelect').addEventListener('change', (e)=>{
+            app.currentProfileId=e.target.value;
+            save(app);
+            updateHeaderStats();
+        });
+        // Progress dialog
+        $('#progressBtn').addEventListener('click',()=>{
+            const p=getCurrentProfile();
+            const date=todayStr();
+            let html=''; let totalScore=0,totalCompleted=0;
+            defaultSubjects.forEach(s=>{
+                const d=p.subjects[s].today[date];
+                const sc=d?d.score:0;
+                const ct=d?d.completed:0;
+                totalScore+=sc; totalCompleted+=ct;
+                html+=`<div class=\"bg-white rounded-xl p-3 my-2 text-xl shadow-inner\">${s}: <b>${ct}</b> attività • <b>${sc}</b> punti</div>`;
+            });
+            html+=`<div class=\"bg-sky-200 rounded-xl p-4 mt-4 text-xl font-bold shadow-md\">Totale oggi: <b>${totalCompleted}</b> attività • <b>${totalScore}</b> punti</div>`;
+            $('#progressSummary').innerHTML=html;
+            $('#progressDialog').showModal();
+        });
+
+        // ---------- NUOVO CODICE PER LO ZOOM +/- ----------
+        const zoomInBtn = $('#zoomInBtn');
+        const zoomOutBtn = $('#zoomOutBtn');
+        const zoomDisplay = $('#zoomDisplay');
+        
+        let currentScale = 1.0;
+        const ZOOM_STEP = 0.15;
+        const MAX_ZOOM = 1.6; // Massimo 160%
+        const MIN_ZOOM = 0.85; // Minimo 85%
+
+        function updateZoom() {
+            // Arrotonda per evitare problemi con i numeri in virgola mobile
+            currentScale = Math.round(currentScale * 100) / 100;
+            
+            // Applica la scala
+            document.body.style.transform = `scale(${currentScale})`;
+            
+            // Aggiorna il display
+            zoomDisplay.textContent = `${Math.round(currentScale * 100)}%`;
+            
+            // Disabilita/Abilita i pulsanti ai limiti
+            zoomInBtn.disabled = currentScale >= MAX_ZOOM;
+            zoomOutBtn.disabled = currentScale <= MIN_ZOOM;
+        }
+
+        zoomInBtn.addEventListener('click', () => {
+            if (currentScale < MAX_ZOOM) {
+                currentScale += ZOOM_STEP;
+                updateZoom();
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            if (currentScale > MIN_ZOOM) {
+                currentScale -= ZOOM_STEP;
+                updateZoom();
+            }
+        });
+        
+        // ---------- Boot ----------
+        initProfiles();
+        $('#mathOpsWrap').classList.toggle('hidden', $('#subject').value!=='Matematica');
+        updateZoom(); // Inizializza lo stato dello zoom al caricamento
+    })();
+    </script>
 </body>
 </html>
