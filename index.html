@@ -487,7 +487,7 @@
                 $('#progressSummary').innerHTML = html; $('#progressDialog').showModal();
             });
             
-            let currentScale = 1.0; const ZOOM_STEP = 0.15, MAX_ZOOM = 1.6, MIN_ZOOM = 0.85;
+            let currentScale = 1.0; const ZOOM_STEP = 0.1, MAX_ZOOM = 1.6, MIN_ZOOM = 0.5;
             const updateZoom = () => { currentScale = Math.round(currentScale * 100) / 100; document.body.style.transform = `scale(${currentScale})`; $('#zoomDisplay').textContent = `${Math.round(currentScale * 100)}%`; $('#zoomInBtn').disabled = currentScale >= MAX_ZOOM; $('#zoomOutBtn').disabled = currentScale <= MIN_ZOOM; };
             $('#zoomInBtn').addEventListener('click', () => { if (currentScale < MAX_ZOOM) { currentScale += ZOOM_STEP; updateZoom(); } });
             $('#zoomOutBtn').addEventListener('click', () => { if (currentScale > MIN_ZOOM) { currentScale -= ZOOM_STEP; updateZoom(); } });
