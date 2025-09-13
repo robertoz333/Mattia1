@@ -193,6 +193,30 @@
       const d = new Date(isoDate);
       return d.toLocaleDateString('it-IT', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
     };
+    // ISO week string like 2025-W37
+    function weekStr(dateObj = new Date()) {
+      const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+      const dayNum = d.getUTCDay() || 7; // Monday=1..Sunday=7
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+      return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
+    }
+    function formatWeekRange(weekKey) {
+      try {
+        const [y, w] = weekKey.split('-W');
+        const year = parseInt(y, 10);
+        const week = parseInt(w, 10);
+        const simple = new Date(Date.UTC(year, 0, 1));
+        const day = simple.getUTCDay() || 7;
+        const daysToAdd = (week - 1) * 7 + (1 - day);
+        const monday = new Date(simple);
+        monday.setUTCDate(simple.getUTCDate() + daysToAdd);
+        const sunday = new Date(monday);
+        sunday.setUTCDate(monday.getUTCDate() + 6);
+        return `Settimana ${week} (${monday.toLocaleDateString('it-IT')} - ${sunday.toLocaleDateString('it-IT')})`;
+      } catch (e) { return weekKey; }
+    }
     const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
     const shuffle = arr => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
     const pick = arr => arr[rand(0, arr.length - 1)];
@@ -201,7 +225,7 @@
     // ---------- Storage ----------
     const STORAGE_KEY = 'kids_learner_v2';
     const defaultSubjects = ['Matematica', 'Inglese', 'Italiano', 'Geografia', 'Scienze', 'Musica'];
-    const baseStats = () => ({ subjectScore: { easy: 0, medium: 0, hard: 0 }, today: {}, unique: new Set(), uniqueArr: [] });
+    const baseStats = () => ({ subjectScore: { easy: 0, medium: 0, hard: 0 }, today: {}, weeks: {}, unique: new Set(), uniqueArr: [] });
 
     function load() {
       let data;
@@ -384,8 +408,14 @@
       }
       subjStats.subjectScore[level] += pts;
 
-      const today = subjStats.today[todayStr()] || (subjStats.today[todayStr()] = { score: 0, completed: 0 });
+      const todayKey = todayStr();
+      const thisWeekKey = weekStr();
+      const today = subjStats.today[todayKey] || (subjStats.today[todayKey] = { score: 0, completed: 0 });
       today.score += pts; today.completed += 1;
+      // record per-week scores and keep history
+      subjStats.weeks[thisWeekKey] = subjStats.weeks[thisWeekKey] || { score: 0, completed: 0 };
+      subjStats.weeks[thisWeekKey].score += pts;
+      subjStats.weeks[thisWeekKey].completed += 1;
       save(app);
       updateAllUI();
     }
@@ -395,6 +425,19 @@
       let totalScore = 0, totalCount = 0;
       defaultSubjects.forEach(s => { const d = p.subjects[s].today[date]; if (d) { totalScore += d.score; totalCount += d.completed; } });
       $('#todayScore').textContent = totalScore; $('#todayCount').textContent = totalCount;
+
+      // week KPIs (current week)
+      const wk = weekStr(); let weekScore = 0, weekCount = 0;
+      defaultSubjects.forEach(s => { const w = p.subjects[s].weeks && p.subjects[s].weeks[wk]; if (w) { weekScore += w.score; weekCount += w.completed; } });
+      // show week KPIs by repurposing the subjectScore element subtitle (or create new ones)
+      // We'll append week info under the Today stats
+      const existing = document.querySelector('#weekSummary');
+      if (existing) existing.remove();
+      const weekNode = document.createElement('div');
+      weekNode.id = 'weekSummary';
+      weekNode.className = 'mt-2 text-sm text-slate-600';
+      weekNode.innerHTML = `Questa settimana: <b class="text-green-600">${weekScore}</b> punti • <b class="text-purple-600">${weekCount}</b> attività`;
+      document.querySelector('.mt-8 > .grid')?.appendChild(weekNode);
     }
 
     function startSession() {
@@ -525,25 +568,29 @@
       $('#level').addEventListener('change', updateHeaderStats);
 
       $('#progressBtn').addEventListener('click', () => {
-        const p = getCurrentProfile(); const date = todayStr();
-        $('#progressDate').textContent = formatDateIt(date);
-        let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'; let totalScoreToday = 0, totalCompletedToday = 0;
+        const p = getCurrentProfile(); const date = todayStr(); const wk = weekStr();
+        $('#progressDate').textContent = `${formatWeekRange(wk)} – (aggiornato ${formatDateIt(date)})`;
+        let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'; let totalScoreToday = 0, totalCompletedToday = 0, totalWeekScore = 0, totalWeekCompleted = 0;
         defaultSubjects.forEach(s => {
           const subjData = p.subjects[s] || baseStats();
           const todayData = subjData.today[date];
           const scoreToday = todayData ? todayData.score : 0; 
           const completedToday = todayData ? todayData.completed : 0;
+          const weekData = subjData.weeks && subjData.weeks[wk] ? subjData.weeks[wk] : { score:0, completed:0 };
+          const weekScore = weekData.score; const weekCompleted = weekData.completed;
           const totalScores = subjData.subjectScore;
           const totalSubjectScore = (totalScores.easy || 0) + (totalScores.medium || 0) + (totalScores.hard || 0);
 
           totalScoreToday += scoreToday; 
           totalCompletedToday += completedToday;
+          totalWeekScore += weekScore; totalWeekCompleted += weekCompleted;
 
-          if (totalSubjectScore > 0 || completedToday > 0) {
+          if (totalSubjectScore > 0 || completedToday > 0 || weekCompleted > 0) {
             html += `
               <div class="bg-white rounded-xl p-4 shadow-inner text-base">
                 <div class="font-bold text-sky-700 text-xl mb-1">${s}</div>
                 <div>Del <b>${formatDateIt(date)}</b>: <b class="text-purple-500">${completedToday}</b> attività • <b class="text-green-500">${scoreToday}</b> punti</div>
+                <div class="mt-1">Questa settimana: <b class="text-purple-600">${weekCompleted}</b> attività • <b class="text-green-600">${weekScore}</b> punti</div>
                 <div class="mt-1">Punteggio Totale: <b class="text-blue-600 text-lg">${totalSubjectScore}</b> punti</div>
                 <div class="text-sm text-slate-600 mt-1">
                   (Facile: <b class="text-green-600">${totalScores.easy || 0}</b>, 
@@ -555,6 +602,24 @@
         });
         html += '</div>';
         html += `<div class="bg-sky-200 rounded-xl p-4 mt-6 text-xl font-bold shadow-md text-center">Totale del <b>${formatDateIt(date)}</b>: <b>${totalCompletedToday}</b> attività • <b>${totalScoreToday}</b> punti</div>`;
+        html += `<div class="bg-sky-100 rounded-xl p-4 mt-4 text-lg font-bold shadow-md text-center">Totale questa settimana: <b>${totalWeekCompleted}</b> attività • <b>${totalWeekScore}</b> punti</div>`;
+        html += '<div class="mt-4 text-sm text-slate-600">Storico settimane (ultime 6):</div>';
+        // weeks history for this profile grouped by subject
+        const weeksMap = {};
+        defaultSubjects.forEach(s => {
+          const subjData = p.subjects[s] || baseStats();
+          if (subjData.weeks) {
+            Object.keys(subjData.weeks).forEach(wkKey => {
+              weeksMap[wkKey] = weeksMap[wkKey] || { score:0, completed:0 };
+              weeksMap[wkKey].score += subjData.weeks[wkKey].score;
+              weeksMap[wkKey].completed += subjData.weeks[wkKey].completed;
+            });
+          }
+        });
+        const weeksSorted = Object.keys(weeksMap).sort().reverse().slice(0,6);
+        html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">';
+        weeksSorted.forEach(wkKey => { const w = weeksMap[wkKey]; html += `<div class="bg-white p-2 rounded-md text-sm shadow-inner">${formatWeekRange(wkKey)}: <b>${w.completed}</b> attività • <b>${w.score}</b> punti</div>`; });
+        html += '</div>';
         $('#progressSummary').innerHTML = html; $('#progressDialog').showModal();
       });
 
