@@ -43,6 +43,27 @@
       max-width: 800px; width: 90%;
     }
     dialog::backdrop { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); }
+    .profile-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .image-placeholder {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #dbeafe;
+      border: 3px dashed #93c5fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #3b82f6;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="text-slate-800">
@@ -50,6 +71,14 @@
   <header class="p-6 bg-sky-300 text-white shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-between">
       <div class="flex items-center gap-4">
+        <!-- Spazio per la foto del bimbo -->
+        <div class="flex items-center gap-3">
+          <div class="image-placeholder" id="profileImagePlaceholder">
+            👤
+          </div>
+          <img id="profileImage" class="profile-image hidden" src="" alt="Foto del bimbo">
+        </div>
+        
         <div class="text-4xl">🚀</div>
         <h1 class="text-3xl font-bold">Impara & Gioca!</h1>
         <div class="flex items-center gap-2 bg-sky-400 p-1 rounded-full ml-4">
@@ -295,6 +324,7 @@
       updateHeaderStats();
       updateTotalScoresDisplay();
       updateButtonStates();
+      updateProfileImage();
     }
 
     function updateHeaderStats() {
@@ -334,6 +364,21 @@
       const isRunning = session.running;
       ['#subject', '#level', '#sessionSize', '#profileSelect', '#addProfileBtn', '#newProfileName', '#startBtn'].forEach(sel => $(sel).disabled = isRunning);
       ['#hintBtn', '#explainBtn', '#flashBtn', '#textAnswer', '#submitTextBtn'].forEach(sel => $(sel).disabled = !isRunning);
+    }
+
+    function updateProfileImage() {
+      const profile = getCurrentProfile();
+      const placeholder = $('#profileImagePlaceholder');
+      const image = $('#profileImage');
+      
+      if (profile.image) {
+        image.src = profile.image;
+        image.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        image.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
     }
 
     // ---------- Generators ----------
@@ -628,6 +673,27 @@
       $('#zoomInBtn').addEventListener('click', () => { if (currentScale < MAX_ZOOM) { currentScale += ZOOM_STEP; updateZoom(); } });
       $('#zoomOutBtn').addEventListener('click', () => { if (currentScale > MIN_ZOOM) { currentScale -= ZOOM_STEP; updateZoom(); } });
       updateZoom();
+
+      // Aggiunta della funzionalità per caricare l'immagine del profilo
+      $('#profileImagePlaceholder').addEventListener('click', () => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = e => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              const profile = getCurrentProfile();
+              profile.image = event.target.result;
+              save(app);
+              updateProfileImage();
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+        fileInput.click();
+      });
     }
 
     // ---------- App Boot ----------
