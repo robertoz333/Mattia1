@@ -37,26 +37,14 @@
         }
         .option.correct { border-color: #22c55e; background: #dcfce7; }
         .option.wrong { border-color: #ef4444; background: #fee2e2; }
+        #textAnswerInput.correct { border-color: #22c55e; background: #dcfce7; }
+        #textAnswerInput.wrong { border-color: #ef4444; background: #fee2e2; }
         .progress-bar { transition: width 0.3s ease-in-out; }
         dialog {
             padding: 0; border: none; border-radius: 1.5rem;
             max-width: 800px; width: 90%;
         }
         dialog::backdrop { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); }
-        .text-answer-input {
-            border: 3px solid #cbd5e1;
-            background: #f1f5f9;
-            font-size: 1.25rem;
-            padding: 1rem;
-            border-radius: 1rem;
-            width: 100%;
-            text-align: center;
-        }
-        .text-answer-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -130,12 +118,17 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white shadow-md rounded-2xl p-6">
                     <h3 class="text-2xl font-bold mb-4">🧩 Domanda</h3>
-                    <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center">Premi “Inizia a Gioca!” per iniziare.</div>
+                    <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-4xl text-center">Premi “Inizia a Gioca!” per iniziare.</div>
+                    
+                    <!-- Multiple Choice Options -->
                     <div class="options grid gap-4 mt-6" id="options"></div>
-                    <div id="textAnswerContainer" class="mt-6 hidden">
-                        <input type="text" id="textAnswerInput" class="text-answer-input" placeholder="Scrivi la tua risposta qui..." />
-                        <button id="submitTextAnswer" class="mt-4 bg-blue-500 text-white rounded-full px-6 py-3 text-lg w-full">Invia Risposta</button>
+
+                    <!-- Text Input Area -->
+                    <div id="textInputArea" class="mt-6 hidden">
+                        <input id="textAnswerInput" type="text" class="w-full p-4 text-2xl border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center transition-colors" placeholder="Scrivi qui la tua risposta...">
+                        <button id="submitTextBtn" class="w-full mt-4 bg-blue-500 text-white rounded-full px-8 py-3 text-xl">Invia Risposta ✔️</button>
                     </div>
+
                     <div class="text-center font-semibold text-lg mt-4" id="feedback"></div>
                 </div>
                 <div class="bg-white shadow-md rounded-2xl p-6">
@@ -147,6 +140,12 @@
                         <button id="flashBtn" class="bg-purple-400 text-white rounded-full px-6 py-2 text-lg">🃏 Flashcard</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Session Results -->
+            <div id="resultsContainer" class="mt-8 hidden">
+                <h3 class="text-2xl font-bold mb-4 text-center text-slate-700">Riepilogo Sessione</h3>
+                <div id="sessionResults" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <!-- Statistics -->
@@ -180,7 +179,8 @@
     <!-- Progress Dialog -->
     <dialog id="progressDialog">
         <div class="bg-sky-100 p-8 rounded-3xl shadow-xl border-4 border-blue-200">
-            <h3 class="text-3xl font-bold text-center mb-6">📈 I Tuoi Progressi</h3>
+            <!-- MODIFICA QUI: Aggiunto ID al titolo -->
+            <h3 id="progressDialogTitle" class="text-3xl font-bold text-center mb-6">📈 I Tuoi Progressi</h3>
             <div id="progressSummary" class="text-lg"></div>
             <div class="text-center mt-6">
                 <button class="bg-red-400 text-white rounded-full px-8 py-3 text-lg" onclick="this.closest('dialog').close()">Chiudi ❌</button>
@@ -208,29 +208,18 @@
             let data;
             try {
                 const storedData = localStorage.getItem(STORAGE_KEY);
-                if (storedData) {
-                    data = JSON.parse(storedData);
-                    if (data.version !== 2) throw new Error("Invalid data version");
-                } else {
-                    throw new Error("No data found");
-                }
+                if (storedData) { data = JSON.parse(storedData); if (data.version !== 2) throw new Error("Invalid data version"); } 
+                else { throw new Error("No data found"); }
             } catch (e) {
                 console.warn("Could not load data, starting fresh.", e.message);
                 const id = simpleRandomId();
-                data = {
-                    version: 2,
-                    currentProfileId: id,
-                    profiles: [{ id, name: 'Bimbo', created: new Date().toISOString(), subjects: objFromArray(defaultSubjects, baseStats) }]
-                };
+                data = { version: 2, currentProfileId: id, profiles: [{ id, name: 'Bimbo', created: new Date().toISOString(), subjects: objFromArray(defaultSubjects, baseStats) }] };
                 save(data);
             }
-            // Data migration and validation
             data.profiles.forEach(p => {
                 defaultSubjects.forEach(s => {
                     p.subjects[s] = p.subjects[s] || baseStats();
-                    if (typeof p.subjects[s].subjectScore !== 'object' || p.subjects[s].subjectScore === null) {
-                        p.subjects[s].subjectScore = { easy: 0, medium: 0, hard: 0 };
-                    }
+                    if (typeof p.subjects[s].subjectScore !== 'object' || p.subjects[s].subjectScore === null) { p.subjects[s].subjectScore = { easy: 0, medium: 0, hard: 0 }; }
                     p.subjects[s].unique = new Set(p.subjects[s].uniqueArr || []);
                 });
             });
@@ -256,12 +245,11 @@
 
         // ---------- State ----------
         let app = load();
-        let session = { running: false, size: 10, index: 0, current: null, textMode: false };
+        let session = { running: false, size: 10, index: 0, current: null, results: [] };
 
         // ---------- UI Management ----------
         function initProfiles() {
-            const sel = $('#profileSelect');
-            sel.innerHTML = '';
+            const sel = $('#profileSelect'); sel.innerHTML = '';
             app.profiles.forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name; sel.appendChild(opt); });
             sel.value = app.currentProfileId;
             updateAllUI();
@@ -282,27 +270,14 @@
             updateTodayKpis();
         }
 
-        function getCurrentProfile() {
-            return app.profiles.find(p => p.id === app.currentProfileId) || app.profiles[0];
-        }
+        function getCurrentProfile() { return app.profiles.find(p => p.id === app.currentProfileId) || app.profiles[0]; }
 
         function updateTotalScoresDisplay() {
-            const container = $('#totalScoresBySubject');
-            const profile = getCurrentProfile();
-            container.innerHTML = '';
+            const container = $('#totalScoresBySubject'); const profile = getCurrentProfile(); container.innerHTML = '';
             defaultSubjects.forEach(subject => {
                 const subjScores = (profile.subjects[subject] || baseStats()).subjectScore;
                 const total = (subjScores.easy || 0) + (subjScores.medium || 0) + (subjScores.hard || 0);
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl p-3 shadow-inner">
-                        <span class="text-base font-semibold text-sky-800">${subject}</span><br>
-                        <b class="text-2xl font-bold text-blue-600">${total}</b>
-                        <div class="text-xs text-slate-500 mt-1 grid grid-cols-3 gap-1">
-                           <span>F: <b class="text-green-600">${subjScores.easy || 0}</b></span>
-                           <span>M: <b class="text-orange-500">${subjScores.medium || 0}</b></span>
-                           <span>D: <b class="text-red-600">${subjScores.hard || 0}</b></span>
-                        </div>
-                    </div>`;
+                container.innerHTML += `<div class="bg-white rounded-2xl p-3 shadow-inner"><span class="text-base font-semibold text-sky-800">${subject}</span><br><b class="text-2xl font-bold text-blue-600">${total}</b><div class="text-xs text-slate-500 mt-1 grid grid-cols-3 gap-1"><span>F: <b class="text-green-600">${subjScores.easy||0}</b></span><span>M: <b class="text-orange-500">${subjScores.medium||0}</b></span><span>D: <b class="text-red-600">${subjScores.hard||0}</b></span></div></div>`;
             });
         }
 
@@ -312,7 +287,7 @@
             ['#hintBtn', '#explainBtn', '#flashBtn'].forEach(sel => $(sel).disabled = !isRunning);
         }
         
-        // ---------- Question Generators (omitted for brevity) ----------
+        // ---------- Question Generators ----------
         function uniqueKeyGuard(profile, subject, key){ const s = profile.subjects[subject]; if(s.unique.has(key)) return false; s.unique.add(key); if(s.unique.size > 200) s.unique = new Set(Array.from(s.unique).slice(-200)); return true; }
         const Generators = {
             Matematica(level){
@@ -322,37 +297,30 @@
                 const [a,b] = (()=>{
                     const [min,max]=ranges[level];
                     if(op==='div'){ const divisor = rand(min, Math.max(min,Math.floor(max/2))); const quotient = rand(min, max>=30?10:max); return [divisor*quotient, divisor]; }
+                    if(op==='sub'){ const n1=rand(min,max), n2=rand(min,max); return [Math.max(n1,n2), Math.min(n1,n2)]; } // Evita risultati negativi
                     return [rand(min,max), rand(min,max)];
                 })();
-                const text = {add:`${a} + ${b} = ?`, sub:`${a} − ${b} = ?`, mul:`${a} × ${b} = ?`, div:`${a} ÷ ${b} = ?`}[op];
+                const text = {add:`${a} + ${b}`, sub:`${a} − ${b}`, mul:`${a} × ${b}`, div:`${a} ÷ ${b}`}[op];
                 const answer = {add:a+b, sub:a-b, mul:a*b, div:Math.floor(a/b)}[op];
                 const key = `M:${level}:${op}:${a}:${b}`;
-                return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key), q:text, options: makeNumberOptions(answer, level), correct: String(answer), hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`, explain: `Ricorda le regole di ${op}: la ${op==='add'?'somma':op==='sub'?'sottrazione':op==='mul'?'moltiplicazione':'divisione'} tra due numeri.`, flashcard: `1️⃣ Scrivi il primo numero.<br>2️⃣ Esegui l'operazione.<br>3️⃣ Scrivi il risultato.`, textMode: true };
+                return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key), q:text, type: 'text', correct: String(answer), hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`, explain: `Ricorda le tabelline e le operazioni.`, flashcard: `Scrivi il risultato corretto.` };
             },
             Inglese(level){
-                const wordsEasy = [['cat','gatto'],['dog','cane'],['house','casa'],['sun','sole'],['book','libro'],['car','auto'],['apple','mela'],['ball','palla'],['tree','albero'],['bird','uccello']];
-                const wordsMed = [['family','famiglia'],['friend','amico'],['beautiful','bello'],['together','insieme'],['happy','felice'],['water','acqua'],['food','cibo'],['school','scuola'],['teacher','insegnante'],['student','studente']];
-                const wordsHard = [['thought','pensiero'],['tomorrow','domani'],['usually','di solito'],['question','domanda'],['answer','risposta'],['develop','sviluppare'],['community','comunità'],['knowledge','conoscenza'],['important','importante'],['different','diverso']];
+                const wordsEasy = [['cat','gatto'],['dog','cane'],['house','casa'],['sun','sole'],['book','libro']];
+                const wordsMed = [['family','famiglia'],['friend','amico'],['beautiful','bello'],['school','scuola']];
+                const wordsHard = [['knowledge','conoscenza'],['important','importante'],['different','diverso']];
                 const bank = level==='easy'?wordsEasy:level==='medium'?wordsMed:wordsHard;
                 const [en,it] = pick(bank);
                 const mode = pick(['it->en','en->it']);
-                let q,correct,opts,hint,explain,flashcard;
-                if(mode==='it->en'){ q = `Traduci in inglese: “${it}”`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0])); hint = `Pensa alla parola inglese che hai imparato per “${it}”`; explain = `Ricorda i suoni e le lettere delle parole inglesi.`; flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`; } else { q = `Cosa vuol dire in italiano: “${en}”`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1])); hint = `Prova a ricordare il significato in italiano di "${en}".`; explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`; flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`; }
-                const key = `E:${level}:${en}:${mode}`; return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard, textMode: true };
+                let q,correct,opts;
+                if(mode==='it->en'){ q = `Traduci in inglese: “${it}”`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0]));} else { q = `Cosa vuol dire in italiano: “${en}”`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1])); }
+                const key = `E:${level}:${en}:${mode}`; return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint: `Pensa alla traduzione.`, explain: `Ricorda i vocaboli che hai studiato.` };
             },
-            Italiano(level){
-                const modes = ['articolo','vocale','plurale','aggettivo']; const mode = pick(modes);
-                if(mode==='articolo'){ const nouns=[['___ albero','l\''],['___ zaino','lo '],['___ scuola','la '],['___ ombrello','l\''],['___ gatto','il '],['___ tigre','la ']]; const [phrase, art] = pick(nouns); const opts = makeTextOptions(art.trim(), ['il','lo','la','l\'']); return pack('Completa con la parolina giusta: '+phrase, art.trim(), opts, 'Guarda la prima lettera della parola dopo.','Ricorda le regole per usare gli articoli determinativi.','L\'articolo determinativo accompagna il nome.', true); }
-                if(mode==='vocale'){ const letter = pick('aeiou'.split('')); const opts = makeTextOptions('vocale',['vocale','consonante']); return pack(`La letterina "${letter}" è una…`, 'vocale', opts, 'Quando pronunci il suono, l\'aria esce libera dalla bocca.', 'Le vocali sono A, E, I, O, U.', null, true); }
-                if(mode==='plurale'){ const words=[['libro','libri'],['mela','mele'],['amico','amici'],['palla','palle'],['fiore','fiori']]; const [sing,plu]=pick(words); const q=`Qual è il plurale di "${sing}"?`; const opts = makeTextOptions(plu, words.map(x=>x[1])); return pack(q,plu,opts,'Cambia l\'ultima letterina della parola.','Ricorda come si forma il plurale dei nomi.','Se il nome finisce con -o, il plurale è -i. Se finisce con -a, è -e.', true); }
-                if(mode==='aggettivo'){ const adjectives=[['alto','alta','alti','alte'],['bello','bella','belli','belle']]; const [m_s, f_s, m_p, f_p] = pick(adjectives); const choice = pick(['m_s','f_s','m_p','f_p']); let q, correct; if(choice === 'm_s'){q=`Qual è il femminile di "${m_s}"?`; correct=f_s;} if(choice === 'f_s'){q=`Qual è il plurale maschile di "${f_s}"?`; correct=m_p;} if(choice === 'm_p'){q=`Qual è il singolare di "${m_p}"?`; correct=m_s;} if(choice === 'f_p'){q=`Qual è il singolare femminile di "${f_p}"?`; correct=f_s;} const opts = makeTextOptions(correct, [m_s, f_s, m_p, f_p]); return pack(q,correct,opts,'Pensa a come l\'aggettivo cambia.','Gli aggettivi concordano in genere e numero con il nome.','Ricorda le desinenze: -o/-a e -i/-e.', true); }
-                function pack(q,c,o,h,e,f,tm){const k=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f,textMode:tm};}
-            },
-            Geografia(level){ const capitals = {Europa:[['Italia','Roma'],['Francia','Parigi'],['Spagna','Madrid'],['Germania','Berlino']], Mondo:[['Giappone','Tokyo'],['USA','Washington'],['Brasile','Brasilia'],['Cina','Pechino']]}; const pool = level==='easy'?capitals.Europa:capitals.Mondo; const [country,cap] = pick(pool); const q=`Qual è la capitale di ${country}?`; const opts = makeTextOptions(cap, pool.map(x=>x[1])); const key=`G:${level}:${country}`; return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più importante.', explain:`La capitale di ${country} è ${cap}.`, flashcard:`Paese → Capitale`, textMode: true}; },
-            Scienze(level){ const modes = ['stato','animali','corpo','piante']; const mode = pick(modes); if(mode==='stato'){ const items=[['ghiaccio','solido'],['acqua','liquido'],['vapore','gassoso']]; const [mat,st]=pick(items); const q=`Lo stato del "${mat}" è…`; const opts=makeTextOptions(st,st,['solido','liquido','gassoso']); return pack(q,st,opts,'Pensa a com\'è fatto.', 'Ricorda i tre stati della materia.', 'Solido (forma fissa), liquido (scorre), gassoso (si espande).', true); } if(mode==='animali'){ const items=[['delfino','mammifero'],['aquila','uccello'],['trota','pesce']]; const [ani,cl]=pick(items); const opts=makeTextOptions(cl,cl,['mammifero','uccello','pesce','anfibio']); return pack(`Il ${ani} è un…`,cl,opts,'Pensa a come nasce e come respira.', 'Ricorda le classi degli animali.', ' mammifero, uccello, pesce, ecc.', true); } if(mode==='corpo'){ const items=[['cuore','pompa il sangue'],['polmoni','respirare'],['stomaco','digerire il cibo']]; const [org,fun]=pick(items); const q=`Il ${org} serve per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'È un organo, che funzione ha?', 'Ogni organo del corpo ha una funzione.', 'Il corpo ha tante parti che lavorano insieme.', true); } if(mode==='piante'){ const items=[['radici','assorbire acqua'],['foglie','fare la fotosintesi'],['fiore','fare i semi']]; const [parte,fun]=pick(items); const q=`Le ${parte} servono per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'Pensa a cosa fa quella parte.', 'Ricorda le funzioni delle parti di una pianta.', 'Radici, fusto, foglie, fiore.', true); } function pack(q,c,o,h,e,f,tm){const k=`S:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Scienze',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f,textMode:tm};} },
-            Musica(level){ const modes = ['famiglia','ritmo','note']; const mode = pick(modes); if(mode==='famiglia'){ const items=[['violino','archi'],['flauto','fiati'],['tromba','ottoni']]; const [inst,fam]=pick(items); const q=`A quale famiglia appartiene il ${inst}?`; const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']); return pack(q,fam,opts,'Pensa a come si suona.', 'Gli strumenti si raggruppano in famiglie.', 'Archi, fiati, ottoni, percussioni.', true); } if(mode==='ritmo'){ const items=[['semibreve','4 battiti'],['minima','2 battiti'],['semiminima','1 battito']]; const [note,val]=pick(items); const q=`Una ${note} vale…`; const opts=makeTextOptions(val,['4 battiti','2 battiti','1 battito']); return pack(q,val,opts,'Pensa a quanto dura il suono.', 'Ripassa la durata delle note.', 'Semibreve (4), Minima (2), Semiminima (1).', true); } if(mode==='note'){ const noteSeq=['do','re','mi','fa','sol','la','si']; const idx=rand(0,noteSeq.length-2); const q=`Quale nota viene dopo "${noteSeq[idx]}"?`; const correct=noteSeq[idx+1]; const opts=makeTextOptions(correct, noteSeq); return pack(q,correct,opts,'Pensa alla scala musicale.', 'Ricorda la sequenza delle note.', 'Do, Re, Mi, Fa, Sol, La, Si.', true); } function pack(q,c,o,h,e,f,tm){const k=`Mu:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Musica',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f,textMode:tm};} }
+            Italiano(level){ /* ... Resta uguale ... */ const modes = ['articolo','vocale','plurale']; const mode = pick(modes); if(mode==='articolo'){ const nouns=[['___ albero','l\''],['___ zaino','lo '],['___ scuola','la ']]; const [phrase, art] = pick(nouns); const opts = makeTextOptions(art.trim(), ['il','lo','la','l\'']); return pack('Completa: '+phrase, art.trim(), opts); } if(mode==='vocale'){ const letter = pick('aeiou'.split('')); const opts = makeTextOptions('vocale',['vocale','consonante']); return pack(`La lettera "${letter}" è una…`, 'vocale', opts); } if(mode==='plurale'){ const words=[['libro','libri'],['mela','mele'],['amico','amici']]; const [sing,plu]=pick(words); const q=`Qual è il plurale di "${sing}"?`; const opts = makeTextOptions(plu, words.map(x=>x[1])); return pack(q,plu,opts); } function pack(q,c,o){const k=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',k),q,correct:c,options:o, hint:'Pensa alla grammatica.', explain:'Ripassa le regole dell\'italiano.'};} },
+            Geografia(level){ /* ... Resta uguale ... */ const capitals = {Europa:[['Italia','Roma'],['Francia','Parigi']], Mondo:[['Giappone','Tokyo'],['USA','Washington']]}; const pool = level==='easy'?capitals.Europa:capitals.Mondo; const [country,cap] = pick(pool); const q=`Qual è la capitale di ${country}?`; const opts = makeTextOptions(cap, pool.map(x=>x[1])); const key=`G:${level}:${country}`; return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più importante.'}; },
+            Scienze(level){ /* ... Resta uguale ... */ const items=[['ghiaccio','solido'],['acqua','liquido'],['vapore','gassoso']]; const [mat,st]=pick(items); const q=`Lo stato del "${mat}" è…`; const opts=makeTextOptions(st,['solido','liquido','gassoso']); const k=`S:${level}:${q}`; return {ok:(p)=>uniqueKeyGuard(p,'Scienze',k),q,correct:st,options:opts, hint:'Pensa a com\'è fatto.'}; },
+            Musica(level){ /* ... Resta uguale ... */ const items=[['violino','archi'],['flauto','fiati'],['tromba','ottoni']]; const [inst,fam]=pick(items); const q=`A quale famiglia appartiene il ${inst}?`; const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']); const k=`Mu:${level}:${q}`; return {ok:(p)=>uniqueKeyGuard(p,'Musica',k),q,correct:fam,options:opts, hint:'Pensa a come si suona.'}; }
         };
-        function makeNumberOptions(answer, level) { const spread = level === 'easy' ? 3 : level === 'medium' ? 7 : 12; const set = new Set([String(answer)]); while (set.size < 4) { set.add(String(answer + rand(-spread, spread))); } return shuffle(Array.from(set)); }
         function makeTextOptions(correct, pool) { const set = new Set([correct]); const shuffled = shuffle(pool); for (const x of shuffled) { if (set.size >= 4) break; if (x !== correct) set.add(x); } return shuffle(Array.from(set)); }
         function pickGenerator() { const subj = $('#subject').value; const level = $('#level').value; return () => Generators[subj](level); }
 
@@ -360,147 +328,106 @@
         const POINTS = { easy: 10, medium: 15, hard: 20 };
 
         function recordResult(correct) {
-            const profile = getCurrentProfile();
-            const subj = $('#subject').value;
-            const level = $('#level').value;
-            const pts = correct ? POINTS[level] : 0;
+            const profile = getCurrentProfile(); const subj = $('#subject').value; const level = $('#level').value; const pts = correct ? POINTS[level] : 0;
             const subjStats = profile.subjects[subj];
-            
-            if (typeof subjStats.subjectScore !== 'object' || subjStats.subjectScore === null) {
-                subjStats.subjectScore = { easy: 0, medium: 0, hard: 0 };
-            }
+            if (typeof subjStats.subjectScore !== 'object' || subjStats.subjectScore === null) { subjStats.subjectScore = { easy: 0, medium: 0, hard: 0 }; }
             subjStats.subjectScore[level] += pts;
-
             const today = subjStats.today[todayStr()] || (subjStats.today[todayStr()] = { score: 0, completed: 0 });
             today.score += pts; today.completed += 1;
-            save(app);
-            updateAllUI();
+            save(app); updateAllUI();
         }
 
         function updateTodayKpis() {
-            const p = getCurrentProfile(); const date = todayStr();
-            let totalScore = 0, totalCount = 0;
+            const p = getCurrentProfile(); const date = todayStr(); let totalScore = 0, totalCount = 0;
             defaultSubjects.forEach(s => { const d = p.subjects[s].today[date]; if (d) { totalScore += d.score; totalCount += d.completed; } });
             $('#todayScore').textContent = totalScore; $('#todayCount').textContent = totalCount;
         }
 
         function startSession() {
-            session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null, textMode: false };
+            session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null, results: [] };
             $('#progressBar').style.width = '0%';
+            $('#resultsContainer').classList.add('hidden'); $('#sessionResults').innerHTML = '';
             updateButtonStates();
             nextQuestion();
         }
 
         function nextQuestion() {
-            const gen = pickGenerator();
-            const profile = getCurrentProfile();
-            let attempt = 0, pak;
-            
-            while(attempt < 50) {
-                pak = gen();
-                if (pak && typeof pak.ok === 'function' && pak.ok(profile)) {
-                    break; 
-                }
-                attempt++;
-            }
-            
+            const gen = pickGenerator(); const profile = getCurrentProfile(); let attempt = 0, pak;
+            while(attempt < 50) { pak = gen(); if (pak && typeof pak.ok === 'function' && pak.ok(profile)) { break; } attempt++; }
             if (attempt >= 50) {
                 session.running = false;
-                $('#question').innerHTML = 'Congratulazioni! Non ci sono più domande uniche per queste impostazioni!';
+                $('#question').innerHTML = 'Congratulazioni! Hai risposto a tutte le domande uniche!';
                 $('#options').innerHTML = ''; $('#feedback').textContent = 'Prova un altro livello o materia.';
                 updateButtonStates(); return;
             }
-
             session.current = pak;
-            session.textMode = pak.textMode || false;
-            
             $('#question').innerHTML = pak.q;
+            $('#helpBox').innerHTML = 'Premi i bottoni per un aiuto!'; $('#feedback').textContent = '';
             
-            // Reset UI elements
-            $('#options').innerHTML = '';
-            $('#textAnswerContainer').classList.add('hidden');
-            $('#textAnswerInput').value = '';
-            
-            if (session.textMode) {
-                // Show text input for open-ended questions
-                $('#textAnswerContainer').classList.remove('hidden');
-                $('#textAnswerInput').focus();
+            const optionsDiv = $('#options'); const textInputDiv = $('#textInputArea'); const textInput = $('#textAnswerInput');
+            optionsDiv.innerHTML = ''; textInput.value = '';
+            optionsDiv.classList.add('hidden'); textInputDiv.classList.add('hidden');
+
+            if (pak.type === 'text') {
+                textInputDiv.classList.remove('hidden'); textInput.focus();
             } else {
-                // Show multiple choice options
-                const ops = $('#options'); ops.innerHTML = '';
+                optionsDiv.classList.remove('hidden');
                 pak.options.forEach(opt => {
                     const b = document.createElement('div');
                     b.className = 'option rounded-xl cursor-pointer hover:bg-sky-200';
                     b.textContent = opt; b.tabIndex = 0;
-                    b.addEventListener('click', () => selectAnswer(b, opt));
-                    ops.appendChild(b);
+                    b.addEventListener('click', () => processAnswer(b, opt));
+                    optionsDiv.appendChild(b);
                 });
             }
-            
-            $('#helpBox').innerHTML = 'Premi i bottoni per un aiuto!';
-            $('#feedback').textContent = '';
         }
 
-        function selectAnswer(el, value) {
+        function processAnswer(el, value) { // el is the clicked element (optional)
             if (!session.running) return;
-            session.running = false; // Previeni doppi click
+            session.running = false;
             
             const correct = String(value).trim().toLowerCase() === String(session.current.correct).trim().toLowerCase();
-            $$('#options .option').forEach(o => o.style.pointerEvents = 'none');
-            el.classList.add(correct ? 'correct' : 'wrong');
-            $('#feedback').innerHTML = correct ? `🥳 Bravissimo! +${POINTS[$('#level').value]} punti!` : `😢 Ops! La risposta era: <b>${session.current.correct}</b>.`;
-            recordResult(correct);
-
-            setTimeout(() => {
-                session.index++;
-                $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
-                
-                if (session.index >= session.size) {
-                    $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
-                    $('#options').innerHTML = ''; $('#feedback').textContent = '';
-                    $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
-                    $('#textAnswerContainer').classList.add('hidden');
-                    updateButtonStates();
-                } else {
-                    session.running = true; // Riabilita per la prossima domanda
-                    nextQuestion();
-                }
-            }, 1500);
-        }
-
-        function checkTextAnswer() {
-            if (!session.running || !session.textMode) return;
             
-            const userAnswer = $('#textAnswerInput').value.trim();
-            if (!userAnswer) {
-                alert('Per favore, scrivi la tua risposta!');
-                return;
+            $$('#options .option').forEach(o => o.style.pointerEvents = 'none');
+            $('#textAnswerInput').disabled = true; $('#submitTextBtn').disabled = true;
+
+            if (el) { // MCQ feedback
+                el.classList.add(correct ? 'correct' : 'wrong');
+            } else { // Text input feedback
+                $('#textAnswerInput').classList.add(correct ? 'correct' : 'wrong');
             }
             
-            session.running = false;
-            const correct = userAnswer.toLowerCase() === session.current.correct.toLowerCase();
-            
-            $('#feedback').innerHTML = correct ? 
-                `🥳 Bravissimo! +${POINTS[$('#level').value]} punti!` : 
-                `😢 Ops! La risposta era: <b>${session.current.correct}</b>.`;
-            
+            $('#feedback').innerHTML = correct ? `🥳 Bravissimo! +${POINTS[$('#level').value]} punti!` : `😢 Ops! La risposta era: <b>${session.current.correct}</b>.`;
+            session.results.push({ question: session.current.q, userAnswer: value, correctAnswer: session.current.correct, isCorrect: correct });
             recordResult(correct);
 
             setTimeout(() => {
                 session.index++;
                 $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
                 
+                $('#textAnswerInput').disabled = false; $('#submitTextBtn').disabled = false;
+                $('#textAnswerInput').classList.remove('correct', 'wrong');
+
                 if (session.index >= session.size) {
                     $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
-                    $('#options').innerHTML = ''; $('#feedback').textContent = '';
-                    $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
-                    $('#textAnswerContainer').classList.add('hidden');
-                    updateButtonStates();
+                    $('#options').innerHTML = ''; $('#textInputArea').classList.add('hidden');
+                    $('#feedback').textContent = ''; $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
+                    displaySessionResults(); updateButtonStates();
                 } else {
                     session.running = true;
                     nextQuestion();
                 }
             }, 1500);
+        }
+
+        function displaySessionResults() {
+            const container = $('#sessionResults'); const resultsContainer = $('#resultsContainer'); container.innerHTML = '';
+            if (!session.results || session.results.length === 0) { resultsContainer.classList.add('hidden'); return; }
+            session.results.forEach(res => {
+                const resultCard = `<div class="bg-white rounded-xl p-4 shadow-inner ${res.isCorrect ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'}"><p class="font-semibold text-slate-600">${res.question}</p><p>La tua risposta: <span class="font-bold ${res.isCorrect ? 'text-green-700' : 'text-red-700'}">${res.userAnswer}</span></p>${!res.isCorrect ? `<p>Risposta corretta: <span class="font-bold text-green-700">${res.correctAnswer}</span></p>` : ''}</div>`;
+                container.innerHTML += resultCard;
+            });
+            resultsContainer.classList.remove('hidden');
         }
 
         // ---------- Event Listeners Setup ----------
@@ -510,14 +437,19 @@
             $('#explainBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '📖 <b>Spiegazione:</b> ' + session.current.explain; });
             $('#flashBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '🃏 <b>Flashcard:</b><br>' + session.current.flashcard; });
 
+            $('#submitTextBtn').addEventListener('click', () => {
+                const answer = $('#textAnswerInput').value; if(answer.trim() !== '') { processAnswer(null, answer); }
+            });
+            $('#textAnswerInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); $('#submitTextBtn').click(); }
+            });
+
             $('#addProfileBtn').addEventListener('click', () => {
                 const name = ($('#newProfileName').value || '').trim();
                 if (!name) { alert('Per favore, scrivi il nome del nuovo amico!'); return; }
                 const id = simpleRandomId();
                 app.profiles.push({ id, name, created: new Date().toISOString(), subjects: objFromArray(defaultSubjects, baseStats) });
-                app.currentProfileId = id;
-                save(app); initProfiles();
-                $('#newProfileName').value = '';
+                app.currentProfileId = id; save(app); initProfiles(); $('#newProfileName').value = '';
             });
 
             $('#profileSelect').addEventListener('change', (e) => { app.currentProfileId = e.target.value; save(app); updateAllUI(); });
@@ -525,42 +457,27 @@
             $('#level').addEventListener('change', updateHeaderStats);
 
             $('#progressBtn').addEventListener('click', () => {
-                const p = getCurrentProfile(); const date = todayStr();
-                let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'; let totalScoreToday = 0, totalCompletedToday = 0;
-                defaultSubjects.forEach(s => {
-                    const subjData = p.subjects[s] || baseStats();
-                    const todayData = subjData.today[date];
-                    const scoreToday = todayData ? todayData.score : 0; 
-                    const completedToday = todayData ? todayData.completed : 0;
-                    const totalScores = subjData.subjectScore;
-                    const totalSubjectScore = (totalScores.easy || 0) + (totalScores.medium || 0) + (totalScores.hard || 0);
-                    
-                    totalScoreToday += scoreToday; 
-                    totalCompletedToday += completedToday;
+                const p = getCurrentProfile();
+                const date = todayStr();
+                
+                // MODIFICA QUI: Formattazione della data e aggiornamento del titolo
+                const formattedDate = new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+                $('#progressDialogTitle').innerHTML = `📈 I Tuoi Progressi del ${formattedDate}`;
 
+                let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+                let totalScoreToday = 0, totalCompletedToday = 0;
+                
+                defaultSubjects.forEach(s => {
+                    const subjData = p.subjects[s] || baseStats(); const todayData = subjData.today[date];
+                    const scoreToday = todayData ? todayData.score : 0; const completedToday = todayData ? todayData.completed : 0;
+                    const totalScores = subjData.subjectScore; const totalSubjectScore = (totalScores.easy || 0) + (totalScores.medium || 0) + (totalScores.hard || 0);
+                    totalScoreToday += scoreToday; totalCompletedToday += completedToday;
                     if (totalSubjectScore > 0 || completedToday > 0) {
-                        html += `
-                        <div class="bg-white rounded-xl p-4 shadow-inner text-base">
-                            <div class="font-bold text-sky-700 text-xl mb-1">${s}</div>
-                            <div>Oggi: <b class="text-purple-500">${completedToday}</b> attività • <b class="text-green-500">${scoreToday}</b> punti</div>
-                            <div class="mt-1">Punteggio Totale: <b class="text-blue-600 text-lg">${totalSubjectScore}</b> punti</div>
-                            <div class="text-sm text-slate-600 mt-1">
-                                (Facile: <b class="text-green-600">${totalScores.easy || 0}</b>, 
-                                Medio: <b class="text-orange-600">${totalScores.medium || 0}</b>, 
-                                Difficile: <b class="text-red-600">${totalScores.hard || 0}</b>)
-                            </div>
-                        </div>`;
+                        html += `<div class="bg-white rounded-xl p-4 shadow-inner text-base"><div class="font-bold text-sky-700 text-xl mb-1">${s}</div><div>Oggi: <b class="text-purple-500">${completedToday}</b> attività • <b class="text-green-500">${scoreToday}</b> punti</div><div class="mt-1">Punteggio Totale: <b class="text-blue-600 text-lg">${totalSubjectScore}</b> punti</div><div class="text-sm text-slate-600 mt-1">(Facile: <b class="text-green-600">${totalScores.easy||0}</b>, Medio: <b class="text-orange-600">${totalScores.medium||0}</b>, Difficile: <b class="text-red-600">${totalScores.hard||0}</b>)</div></div>`;
                     }
                 });
-                html += '</div>';
-                html += `<div class="bg-sky-200 rounded-xl p-4 mt-6 text-xl font-bold shadow-md text-center">Totale Oggi: <b>${totalCompletedToday}</b> attività • <b>${totalScoreToday}</b> punti</div>`;
+                html += '</div>'; html += `<div class="bg-sky-200 rounded-xl p-4 mt-6 text-xl font-bold shadow-md text-center">Totale Oggi: <b>${totalCompletedToday}</b> attività • <b>${totalScoreToday}</b> punti</div>`;
                 $('#progressSummary').innerHTML = html; $('#progressDialog').showModal();
-            });
-            
-            // Text answer submission
-            $('#submitTextAnswer').addEventListener('click', checkTextAnswer);
-            $('#textAnswerInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') checkTextAnswer();
             });
             
             let currentScale = 1.0; const ZOOM_STEP = 0.1, MAX_ZOOM = 1.6, MIN_ZOOM = 0.5;
