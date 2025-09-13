@@ -43,6 +43,20 @@
             max-width: 800px; width: 90%;
         }
         dialog::backdrop { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); }
+        .text-answer-input {
+            border: 3px solid #cbd5e1;
+            background: #f1f5f9;
+            font-size: 1.25rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+        .text-answer-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -118,6 +132,10 @@
                     <h3 class="text-2xl font-bold mb-4">🧩 Domanda</h3>
                     <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center">Premi “Inizia a Gioca!” per iniziare.</div>
                     <div class="options grid gap-4 mt-6" id="options"></div>
+                    <div id="textAnswerContainer" class="mt-6 hidden">
+                        <input type="text" id="textAnswerInput" class="text-answer-input" placeholder="Scrivi la tua risposta qui..." />
+                        <button id="submitTextAnswer" class="mt-4 bg-blue-500 text-white rounded-full px-6 py-3 text-lg w-full">Invia Risposta</button>
+                    </div>
                     <div class="text-center font-semibold text-lg mt-4" id="feedback"></div>
                 </div>
                 <div class="bg-white shadow-md rounded-2xl p-6">
@@ -238,7 +256,7 @@
 
         // ---------- State ----------
         let app = load();
-        let session = { running: false, size: 10, index: 0, current: null };
+        let session = { running: false, size: 10, index: 0, current: null, textMode: false };
 
         // ---------- UI Management ----------
         function initProfiles() {
@@ -309,7 +327,7 @@
                 const text = {add:`${a} + ${b} = ?`, sub:`${a} − ${b} = ?`, mul:`${a} × ${b} = ?`, div:`${a} ÷ ${b} = ?`}[op];
                 const answer = {add:a+b, sub:a-b, mul:a*b, div:Math.floor(a/b)}[op];
                 const key = `M:${level}:${op}:${a}:${b}`;
-                return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key), q:text, options: makeNumberOptions(answer, level), correct: String(answer), hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`, explain: `Ricorda le regole di ${op}: la ${op==='add'?'somma':op==='sub'?'sottrazione':op==='mul'?'moltiplicazione':'divisione'} tra due numeri.`, flashcard: `1️⃣ Scrivi il primo numero.<br>2️⃣ Esegui l'operazione.<br>3️⃣ Scrivi il risultato.` };
+                return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key), q:text, options: makeNumberOptions(answer, level), correct: String(answer), hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`, explain: `Ricorda le regole di ${op}: la ${op==='add'?'somma':op==='sub'?'sottrazione':op==='mul'?'moltiplicazione':'divisione'} tra due numeri.`, flashcard: `1️⃣ Scrivi il primo numero.<br>2️⃣ Esegui l'operazione.<br>3️⃣ Scrivi il risultato.`, textMode: true };
             },
             Inglese(level){
                 const wordsEasy = [['cat','gatto'],['dog','cane'],['house','casa'],['sun','sole'],['book','libro'],['car','auto'],['apple','mela'],['ball','palla'],['tree','albero'],['bird','uccello']];
@@ -320,19 +338,19 @@
                 const mode = pick(['it->en','en->it']);
                 let q,correct,opts,hint,explain,flashcard;
                 if(mode==='it->en'){ q = `Traduci in inglese: “${it}”`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0])); hint = `Pensa alla parola inglese che hai imparato per “${it}”`; explain = `Ricorda i suoni e le lettere delle parole inglesi.`; flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`; } else { q = `Cosa vuol dire in italiano: “${en}”`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1])); hint = `Prova a ricordare il significato in italiano di "${en}".`; explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`; flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`; }
-                const key = `E:${level}:${en}:${mode}`; return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard };
+                const key = `E:${level}:${en}:${mode}`; return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard, textMode: true };
             },
             Italiano(level){
                 const modes = ['articolo','vocale','plurale','aggettivo']; const mode = pick(modes);
-                if(mode==='articolo'){ const nouns=[['___ albero','l\''],['___ zaino','lo '],['___ scuola','la '],['___ ombrello','l\''],['___ gatto','il '],['___ tigre','la ']]; const [phrase, art] = pick(nouns); const opts = makeTextOptions(art.trim(), ['il','lo','la','l\'']); return pack('Completa con la parolina giusta: '+phrase, art.trim(), opts, 'Guarda la prima lettera della parola dopo.','Ricorda le regole per usare gli articoli determinativi.','L\'articolo determinativo accompagna il nome.'); }
-                if(mode==='vocale'){ const letter = pick('aeiou'.split('')); const opts = makeTextOptions('vocale',['vocale','consonante']); return pack(`La letterina "${letter}" è una…`, 'vocale', opts, 'Quando pronunci il suono, l\'aria esce libera dalla bocca.', 'Le vocali sono A, E, I, O, U.'); }
-                if(mode==='plurale'){ const words=[['libro','libri'],['mela','mele'],['amico','amici'],['palla','palle'],['fiore','fiori']]; const [sing,plu]=pick(words); const q=`Qual è il plurale di "${sing}"?`; const opts = makeTextOptions(plu, words.map(x=>x[1])); return pack(q,plu,opts,'Cambia l\'ultima letterina della parola.','Ricorda come si forma il plurale dei nomi.','Se il nome finisce con -o, il plurale è -i. Se finisce con -a, è -e.'); }
-                if(mode==='aggettivo'){ const adjectives=[['alto','alta','alti','alte'],['bello','bella','belli','belle']]; const [m_s, f_s, m_p, f_p] = pick(adjectives); const choice = pick(['m_s','f_s','m_p','f_p']); let q, correct; if(choice === 'm_s'){q=`Qual è il femminile di "${m_s}"?`; correct=f_s;} if(choice === 'f_s'){q=`Qual è il plurale maschile di "${f_s}"?`; correct=m_p;} if(choice === 'm_p'){q=`Qual è il singolare di "${m_p}"?`; correct=m_s;} if(choice === 'f_p'){q=`Qual è il singolare femminile di "${f_p}"?`; correct=f_s;} const opts = makeTextOptions(correct, [m_s, f_s, m_p, f_p]); return pack(q,correct,opts,'Pensa a come l\'aggettivo cambia.','Gli aggettivi concordano in genere e numero con il nome.','Ricorda le desinenze: -o/-a e -i/-e.'); }
-                function pack(q,c,o,h,e,f){const k=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f};}
+                if(mode==='articolo'){ const nouns=[['___ albero','l\''],['___ zaino','lo '],['___ scuola','la '],['___ ombrello','l\''],['___ gatto','il '],['___ tigre','la ']]; const [phrase, art] = pick(nouns); const opts = makeTextOptions(art.trim(), ['il','lo','la','l\'']); return pack('Completa con la parolina giusta: '+phrase, art.trim(), opts, 'Guarda la prima lettera della parola dopo.','Ricorda le regole per usare gli articoli determinativi.','L\'articolo determinativo accompagna il nome.', true); }
+                if(mode==='vocale'){ const letter = pick('aeiou'.split('')); const opts = makeTextOptions('vocale',['vocale','consonante']); return pack(`La letterina "${letter}" è una…`, 'vocale', opts, 'Quando pronunci il suono, l\'aria esce libera dalla bocca.', 'Le vocali sono A, E, I, O, U.', null, true); }
+                if(mode==='plurale'){ const words=[['libro','libri'],['mela','mele'],['amico','amici'],['palla','palle'],['fiore','fiori']]; const [sing,plu]=pick(words); const q=`Qual è il plurale di "${sing}"?`; const opts = makeTextOptions(plu, words.map(x=>x[1])); return pack(q,plu,opts,'Cambia l\'ultima letterina della parola.','Ricorda come si forma il plurale dei nomi.','Se il nome finisce con -o, il plurale è -i. Se finisce con -a, è -e.', true); }
+                if(mode==='aggettivo'){ const adjectives=[['alto','alta','alti','alte'],['bello','bella','belli','belle']]; const [m_s, f_s, m_p, f_p] = pick(adjectives); const choice = pick(['m_s','f_s','m_p','f_p']); let q, correct; if(choice === 'm_s'){q=`Qual è il femminile di "${m_s}"?`; correct=f_s;} if(choice === 'f_s'){q=`Qual è il plurale maschile di "${f_s}"?`; correct=m_p;} if(choice === 'm_p'){q=`Qual è il singolare di "${m_p}"?`; correct=m_s;} if(choice === 'f_p'){q=`Qual è il singolare femminile di "${f_p}"?`; correct=f_s;} const opts = makeTextOptions(correct, [m_s, f_s, m_p, f_p]); return pack(q,correct,opts,'Pensa a come l\'aggettivo cambia.','Gli aggettivi concordano in genere e numero con il nome.','Ricorda le desinenze: -o/-a e -i/-e.', true); }
+                function pack(q,c,o,h,e,f,tm){const k=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f,textMode:tm};}
             },
-            Geografia(level){ const capitals = {Europa:[['Italia','Roma'],['Francia','Parigi'],['Spagna','Madrid'],['Germania','Berlino']], Mondo:[['Giappone','Tokyo'],['USA','Washington'],['Brasile','Brasilia'],['Cina','Pechino']]}; const pool = level==='easy'?capitals.Europa:capitals.Mondo; const [country,cap] = pick(pool); const q=`Qual è la capitale di ${country}?`; const opts = makeTextOptions(cap, pool.map(x=>x[1])); const key=`G:${level}:${country}`; return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più importante.', explain:`La capitale di ${country} è ${cap}.`, flashcard:`Paese → Capitale`}; },
-            Scienze(level){ const modes = ['stato','animali','corpo','piante']; const mode = pick(modes); if(mode==='stato'){ const items=[['ghiaccio','solido'],['acqua','liquido'],['vapore','gassoso']]; const [mat,st]=pick(items); const q=`Lo stato del "${mat}" è…`; const opts=makeTextOptions(st,['solido','liquido','gassoso']); return pack(q,st,opts,'Pensa a com\'è fatto.', 'Ricorda i tre stati della materia.', 'Solido (forma fissa), liquido (scorre), gassoso (si espande).'); } if(mode==='animali'){ const items=[['delfino','mammifero'],['aquila','uccello'],['trota','pesce']]; const [ani,cl]=pick(items); const opts=makeTextOptions(cl,['mammifero','uccello','pesce','anfibio']); return pack(`Il ${ani} è un…`,cl,opts,'Pensa a come nasce e come respira.', 'Ricorda le classi degli animali.', ' mammifero, uccello, pesce, ecc.'); } if(mode==='corpo'){ const items=[['cuore','pompa il sangue'],['polmoni','respirare'],['stomaco','digerire il cibo']]; const [org,fun]=pick(items); const q=`Il ${org} serve per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'È un organo, che funzione ha?', 'Ogni organo del corpo ha una funzione.', 'Il corpo ha tante parti che lavorano insieme.'); } if(mode==='piante'){ const items=[['radici','assorbire acqua'],['foglie','fare la fotosintesi'],['fiore','fare i semi']]; const [parte,fun]=pick(items); const q=`Le ${parte} servono per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'Pensa a cosa fa quella parte.', 'Ricorda le funzioni delle parti di una pianta.', 'Radici, fusto, foglie, fiore.'); } function pack(q,c,o,h,e,f){const k=`S:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Scienze',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f};} },
-            Musica(level){ const modes = ['famiglia','ritmo','note']; const mode = pick(modes); if(mode==='famiglia'){ const items=[['violino','archi'],['flauto','fiati'],['tromba','ottoni']]; const [inst,fam]=pick(items); const q=`A quale famiglia appartiene il ${inst}?`; const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']); return pack(q,fam,opts,'Pensa a come si suona.', 'Gli strumenti si raggruppano in famiglie.', 'Archi, fiati, ottoni, percussioni.'); } if(mode==='ritmo'){ const items=[['semibreve','4 battiti'],['minima','2 battiti'],['semiminima','1 battito']]; const [note,val]=pick(items); const q=`Una ${note} vale…`; const opts=makeTextOptions(val,['4 battiti','2 battiti','1 battito']); return pack(q,val,opts,'Pensa a quanto dura il suono.', 'Ripassa la durata delle note.', 'Semibreve (4), Minima (2), Semiminima (1).'); } if(mode==='note'){ const noteSeq=['do','re','mi','fa','sol','la','si']; const idx=rand(0,noteSeq.length-2); const q=`Quale nota viene dopo "${noteSeq[idx]}"?`; const correct=noteSeq[idx+1]; const opts=makeTextOptions(correct, noteSeq); return pack(q,correct,opts,'Pensa alla scala musicale.', 'Ricorda la sequenza delle note.', 'Do, Re, Mi, Fa, Sol, La, Si.'); } function pack(q,c,o,h,e,f){const k=`Mu:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Musica',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f};} }
+            Geografia(level){ const capitals = {Europa:[['Italia','Roma'],['Francia','Parigi'],['Spagna','Madrid'],['Germania','Berlino']], Mondo:[['Giappone','Tokyo'],['USA','Washington'],['Brasile','Brasilia'],['Cina','Pechino']]}; const pool = level==='easy'?capitals.Europa:capitals.Mondo; const [country,cap] = pick(pool); const q=`Qual è la capitale di ${country}?`; const opts = makeTextOptions(cap, pool.map(x=>x[1])); const key=`G:${level}:${country}`; return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più importante.', explain:`La capitale di ${country} è ${cap}.`, flashcard:`Paese → Capitale`, textMode: true}; },
+            Scienze(level){ const modes = ['stato','animali','corpo','piante']; const mode = pick(modes); if(mode==='stato'){ const items=[['ghiaccio','solido'],['acqua','liquido'],['vapore','gassoso']]; const [mat,st]=pick(items); const q=`Lo stato del "${mat}" è…`; const opts=makeTextOptions(st,st,['solido','liquido','gassoso']); return pack(q,st,opts,'Pensa a com\'è fatto.', 'Ricorda i tre stati della materia.', 'Solido (forma fissa), liquido (scorre), gassoso (si espande).', true); } if(mode==='animali'){ const items=[['delfino','mammifero'],['aquila','uccello'],['trota','pesce']]; const [ani,cl]=pick(items); const opts=makeTextOptions(cl,cl,['mammifero','uccello','pesce','anfibio']); return pack(`Il ${ani} è un…`,cl,opts,'Pensa a come nasce e come respira.', 'Ricorda le classi degli animali.', ' mammifero, uccello, pesce, ecc.', true); } if(mode==='corpo'){ const items=[['cuore','pompa il sangue'],['polmoni','respirare'],['stomaco','digerire il cibo']]; const [org,fun]=pick(items); const q=`Il ${org} serve per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'È un organo, che funzione ha?', 'Ogni organo del corpo ha una funzione.', 'Il corpo ha tante parti che lavorano insieme.', true); } if(mode==='piante'){ const items=[['radici','assorbire acqua'],['foglie','fare la fotosintesi'],['fiore','fare i semi']]; const [parte,fun]=pick(items); const q=`Le ${parte} servono per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'Pensa a cosa fa quella parte.', 'Ricorda le funzioni delle parti di una pianta.', 'Radici, fusto, foglie, fiore.', true); } function pack(q,c,o,h,e,f,tm){const k=`S:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Scienze',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f,textMode:tm};} },
+            Musica(level){ const modes = ['famiglia','ritmo','note']; const mode = pick(modes); if(mode==='famiglia'){ const items=[['violino','archi'],['flauto','fiati'],['tromba','ottoni']]; const [inst,fam]=pick(items); const q=`A quale famiglia appartiene il ${inst}?`; const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']); return pack(q,fam,opts,'Pensa a come si suona.', 'Gli strumenti si raggruppano in famiglie.', 'Archi, fiati, ottoni, percussioni.', true); } if(mode==='ritmo'){ const items=[['semibreve','4 battiti'],['minima','2 battiti'],['semiminima','1 battito']]; const [note,val]=pick(items); const q=`Una ${note} vale…`; const opts=makeTextOptions(val,['4 battiti','2 battiti','1 battito']); return pack(q,val,opts,'Pensa a quanto dura il suono.', 'Ripassa la durata delle note.', 'Semibreve (4), Minima (2), Semiminima (1).', true); } if(mode==='note'){ const noteSeq=['do','re','mi','fa','sol','la','si']; const idx=rand(0,noteSeq.length-2); const q=`Quale nota viene dopo "${noteSeq[idx]}"?`; const correct=noteSeq[idx+1]; const opts=makeTextOptions(correct, noteSeq); return pack(q,correct,opts,'Pensa alla scala musicale.', 'Ricorda la sequenza delle note.', 'Do, Re, Mi, Fa, Sol, La, Si.', true); } function pack(q,c,o,h,e,f,tm){const k=`Mu:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Musica',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f,textMode:tm};} }
         };
         function makeNumberOptions(answer, level) { const spread = level === 'easy' ? 3 : level === 'medium' ? 7 : 12; const set = new Set([String(answer)]); while (set.size < 4) { set.add(String(answer + rand(-spread, spread))); } return shuffle(Array.from(set)); }
         function makeTextOptions(correct, pool) { const set = new Set([correct]); const shuffled = shuffle(pool); for (const x of shuffled) { if (set.size >= 4) break; if (x !== correct) set.add(x); } return shuffle(Array.from(set)); }
@@ -367,7 +385,7 @@
         }
 
         function startSession() {
-            session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null };
+            session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null, textMode: false };
             $('#progressBar').style.width = '0%';
             updateButtonStates();
             nextQuestion();
@@ -394,15 +412,31 @@
             }
 
             session.current = pak;
+            session.textMode = pak.textMode || false;
+            
             $('#question').innerHTML = pak.q;
-            const ops = $('#options'); ops.innerHTML = '';
-            pak.options.forEach(opt => {
-                const b = document.createElement('div');
-                b.className = 'option rounded-xl cursor-pointer hover:bg-sky-200';
-                b.textContent = opt; b.tabIndex = 0;
-                b.addEventListener('click', () => selectAnswer(b, opt));
-                ops.appendChild(b);
-            });
+            
+            // Reset UI elements
+            $('#options').innerHTML = '';
+            $('#textAnswerContainer').classList.add('hidden');
+            $('#textAnswerInput').value = '';
+            
+            if (session.textMode) {
+                // Show text input for open-ended questions
+                $('#textAnswerContainer').classList.remove('hidden');
+                $('#textAnswerInput').focus();
+            } else {
+                // Show multiple choice options
+                const ops = $('#options'); ops.innerHTML = '';
+                pak.options.forEach(opt => {
+                    const b = document.createElement('div');
+                    b.className = 'option rounded-xl cursor-pointer hover:bg-sky-200';
+                    b.textContent = opt; b.tabIndex = 0;
+                    b.addEventListener('click', () => selectAnswer(b, opt));
+                    ops.appendChild(b);
+                });
+            }
+            
             $('#helpBox').innerHTML = 'Premi i bottoni per un aiuto!';
             $('#feedback').textContent = '';
         }
@@ -425,9 +459,45 @@
                     $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
                     $('#options').innerHTML = ''; $('#feedback').textContent = '';
                     $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
+                    $('#textAnswerContainer').classList.add('hidden');
                     updateButtonStates();
                 } else {
                     session.running = true; // Riabilita per la prossima domanda
+                    nextQuestion();
+                }
+            }, 1500);
+        }
+
+        function checkTextAnswer() {
+            if (!session.running || !session.textMode) return;
+            
+            const userAnswer = $('#textAnswerInput').value.trim();
+            if (!userAnswer) {
+                alert('Per favore, scrivi la tua risposta!');
+                return;
+            }
+            
+            session.running = false;
+            const correct = userAnswer.toLowerCase() === session.current.correct.toLowerCase();
+            
+            $('#feedback').innerHTML = correct ? 
+                `🥳 Bravissimo! +${POINTS[$('#level').value]} punti!` : 
+                `😢 Ops! La risposta era: <b>${session.current.correct}</b>.`;
+            
+            recordResult(correct);
+
+            setTimeout(() => {
+                session.index++;
+                $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
+                
+                if (session.index >= session.size) {
+                    $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
+                    $('#options').innerHTML = ''; $('#feedback').textContent = '';
+                    $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
+                    $('#textAnswerContainer').classList.add('hidden');
+                    updateButtonStates();
+                } else {
+                    session.running = true;
                     nextQuestion();
                 }
             }, 1500);
@@ -485,6 +555,12 @@
                 html += '</div>';
                 html += `<div class="bg-sky-200 rounded-xl p-4 mt-6 text-xl font-bold shadow-md text-center">Totale Oggi: <b>${totalCompletedToday}</b> attività • <b>${totalScoreToday}</b> punti</div>`;
                 $('#progressSummary').innerHTML = html; $('#progressDialog').showModal();
+            });
+            
+            // Text answer submission
+            $('#submitTextAnswer').addEventListener('click', checkTextAnswer);
+            $('#textAnswerInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkTextAnswer();
             });
             
             let currentScale = 1.0; const ZOOM_STEP = 0.1, MAX_ZOOM = 1.6, MIN_ZOOM = 0.5;
