@@ -74,6 +74,76 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
+
+    /* Drawing Box Styles */
+    #drawingBox {
+      display: none;
+      background: #ffffff;
+      border: 3px solid #3b82f6;
+      border-radius: 1rem;
+      animation: slideIn 0.3s ease-out;
+    }
+    #drawingBox.show {
+      display: block;
+    }
+    #drawingCanvas {
+      border: 2px dashed #cbd5e1;
+      border-radius: 0.5rem;
+      cursor: crosshair;
+      touch-action: none;
+      background: #ffffff;
+    }
+    .color-palette {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .color-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .color-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .color-btn.active {
+      border-color: #1e40af;
+      box-shadow: 0 0 0 2px #3b82f6;
+      transform: scale(1.2);
+    }
+    .brush-size-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: #cbd5e1;
+      outline: none;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .brush-size-slider:hover {
+      opacity: 1;
+    }
+    .brush-size-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+    }
+    .brush-size-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: none;
+    }
     
     /* Animations */
     @keyframes fadeIn {
@@ -211,13 +281,61 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white shadow-md rounded-2xl p-6">
           <h3 class="text-2xl font-bold mb-4 animate-slideIn">🧩 Domanda</h3>
-          <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center animate-fadeIn">Premi “Inizia a Gioca!” per iniziare.</div>
+          <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center animate-fadeIn">Premi "Inizia a Gioca!" per iniziare.</div>
           <div class="options grid gap-4 mt-6" id="options"></div>
 
           <!-- Campo risposta testuale + invio -->
           <div id="textAnswerWrap" class="mt-4 flex items-center gap-2">
             <input id="textAnswer" type="text" class="flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Scrivi la tua risposta e premi Invio…" disabled>
             <button id="submitTextBtn" class="bg-blue-500 text-white rounded-xl px-5 py-3" disabled>Invia</button>
+          </div>
+
+          <!-- Drawing Toggle Button -->
+          <div class="mt-4 text-center">
+            <button id="drawingToggleBtn" class="bg-purple-500 text-white rounded-full px-6 py-3 text-lg" disabled>🎨 Disegna</button>
+          </div>
+
+          <!-- Drawing Box -->
+          <div id="drawingBox" class="mt-4 p-4">
+            <div class="flex flex-col gap-4">
+              <!-- Canvas -->
+              <div class="flex justify-center">
+                <canvas id="drawingCanvas" width="400" height="300"></canvas>
+              </div>
+              
+              <!-- Drawing Controls -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Color Palette -->
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">🎨 Colori:</label>
+                  <div class="color-palette">
+                    <div class="color-btn active" style="background-color: #000000" data-color="#000000"></div>
+                    <div class="color-btn" style="background-color: #ef4444" data-color="#ef4444"></div>
+                    <div class="color-btn" style="background-color: #3b82f6" data-color="#3b82f6"></div>
+                    <div class="color-btn" style="background-color: #22c55e" data-color="#22c55e"></div>
+                    <div class="color-btn" style="background-color: #f59e0b" data-color="#f59e0b"></div>
+                    <div class="color-btn" style="background-color: #8b5cf6" data-color="#8b5cf6"></div>
+                    <div class="color-btn" style="background-color: #ec4899" data-color="#ec4899"></div>
+                    <div class="color-btn" style="background-color: #6b7280" data-color="#6b7280"></div>
+                  </div>
+                </div>
+                
+                <!-- Brush Size -->
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">✏️ Dimensione pennello:</label>
+                  <input type="range" id="brushSize" min="1" max="20" value="3" class="brush-size-slider">
+                  <div class="text-center text-sm text-slate-600 mt-1">
+                    <span id="brushSizeDisplay">3</span>px
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex flex-wrap justify-center gap-3">
+                <button id="clearCanvasBtn" class="bg-red-400 text-white rounded-full px-4 py-2 text-sm">🗑️ Cancella tutto</button>
+                <button id="saveDrawingBtn" class="bg-green-400 text-white rounded-full px-4 py-2 text-sm">💾 Salva disegno</button>
+              </div>
+            </div>
           </div>
 
           <div class="text-center font-semibold text-lg mt-4" id="feedback"></div>
@@ -308,6 +426,186 @@
     const shuffle = arr => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
     const pick = arr => arr[rand(0, arr.length - 1)];
     const simpleRandomId = () => `id-${Date.now().toString(36)}-${Math.random().toString(36).substring(2)}`;
+
+    // ---------- Drawing System ----------
+    let drawingState = {
+      isDrawing: false,
+      isDrawingBoxOpen: false,
+      currentColor: '#000000',
+      currentBrushSize: 3,
+      canvas: null,
+      ctx: null
+    };
+
+    function initDrawingSystem() {
+      drawingState.canvas = $('#drawingCanvas');
+      drawingState.ctx = drawingState.canvas.getContext('2d');
+      
+      // Set up canvas
+      drawingState.ctx.lineCap = 'round';
+      drawingState.ctx.lineJoin = 'round';
+      drawingState.ctx.strokeStyle = drawingState.currentColor;
+      drawingState.ctx.lineWidth = drawingState.currentBrushSize;
+      
+      setupDrawingEventListeners();
+    }
+
+    function setupDrawingEventListeners() {
+      const canvas = drawingState.canvas;
+      
+      // Drawing Toggle Button
+      $('#drawingToggleBtn').addEventListener('click', toggleDrawingBox);
+      
+      // Color Palette
+      $$('.color-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          $$('.color-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          drawingState.currentColor = btn.dataset.color;
+          drawingState.ctx.strokeStyle = drawingState.currentColor;
+        });
+      });
+      
+      // Brush Size Slider
+      $('#brushSize').addEventListener('input', (e) => {
+        drawingState.currentBrushSize = parseInt(e.target.value);
+        drawingState.ctx.lineWidth = drawingState.currentBrushSize;
+        $('#brushSizeDisplay').textContent = drawingState.currentBrushSize;
+      });
+      
+      // Clear Canvas Button
+      $('#clearCanvasBtn').addEventListener('click', clearCanvas);
+      
+      // Save Drawing Button
+      $('#saveDrawingBtn').addEventListener('click', saveDrawing);
+      
+      // Mouse Events
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseout', stopDrawing);
+      
+      // Touch Events (mobile/tablet)
+      canvas.addEventListener('touchstart', handleTouch, { passive: false });
+      canvas.addEventListener('touchmove', handleTouch, { passive: false });
+      canvas.addEventListener('touchend', stopDrawing);
+      canvas.addEventListener('touchcancel', stopDrawing);
+    }
+    
+    function toggleDrawingBox() {
+      const box = $('#drawingBox');
+      drawingState.isDrawingBoxOpen = !drawingState.isDrawingBoxOpen;
+      
+      if (drawingState.isDrawingBoxOpen) {
+        box.classList.add('show');
+        $('#drawingToggleBtn').textContent = '❌ Chiudi Disegno';
+        $('#drawingToggleBtn').className = 'bg-red-500 text-white rounded-full px-6 py-3 text-lg';
+        // Resize canvas to fit container
+        resizeCanvas();
+      } else {
+        box.classList.remove('show');
+        $('#drawingToggleBtn').textContent = '🎨 Disegna';
+        $('#drawingToggleBtn').className = 'bg-purple-500 text-white rounded-full px-6 py-3 text-lg';
+      }
+    }
+    
+    function resizeCanvas() {
+      const canvas = drawingState.canvas;
+      const container = canvas.parentElement;
+      const containerWidth = container.clientWidth;
+      const maxWidth = Math.min(400, containerWidth - 40);
+      const ratio = 300 / 400; // height / width
+      
+      canvas.width = maxWidth;
+      canvas.height = maxWidth * ratio;
+      canvas.style.width = maxWidth + 'px';
+      canvas.style.height = (maxWidth * ratio) + 'px';
+      
+      // Re-apply drawing settings
+      drawingState.ctx.lineCap = 'round';
+      drawingState.ctx.lineJoin = 'round';
+      drawingState.ctx.strokeStyle = drawingState.currentColor;
+      drawingState.ctx.lineWidth = drawingState.currentBrushSize;
+    }
+    
+    function getMousePos(e) {
+      const rect = drawingState.canvas.getBoundingClientRect();
+      const scaleX = drawingState.canvas.width / rect.width;
+      const scaleY = drawingState.canvas.height / rect.height;
+      
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+    
+    function getTouchPos(e) {
+      const rect = drawingState.canvas.getBoundingClientRect();
+      const scaleX = drawingState.canvas.width / rect.width;
+      const scaleY = drawingState.canvas.height / rect.height;
+      
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top) * scaleY
+      };
+    }
+    
+    function startDrawing(e) {
+      drawingState.isDrawing = true;
+      const pos = getMousePos(e);
+      drawingState.ctx.beginPath();
+      drawingState.ctx.moveTo(pos.x, pos.y);
+    }
+    
+    function draw(e) {
+      if (!drawingState.isDrawing) return;
+      
+      const pos = getMousePos(e);
+      drawingState.ctx.lineTo(pos.x, pos.y);
+      drawingState.ctx.stroke();
+    }
+    
+    function stopDrawing() {
+      if (drawingState.isDrawing) {
+        drawingState.isDrawing = false;
+        drawingState.ctx.beginPath();
+      }
+    }
+    
+    function handleTouch(e) {
+      e.preventDefault();
+      
+      if (e.type === 'touchstart') {
+        drawingState.isDrawing = true;
+        const pos = getTouchPos(e);
+        drawingState.ctx.beginPath();
+        drawingState.ctx.moveTo(pos.x, pos.y);
+      } else if (e.type === 'touchmove' && drawingState.isDrawing) {
+        const pos = getTouchPos(e);
+        drawingState.ctx.lineTo(pos.x, pos.y);
+        drawingState.ctx.stroke();
+      }
+    }
+    
+    function clearCanvas() {
+      drawingState.ctx.clearRect(0, 0, drawingState.canvas.width, drawingState.canvas.height);
+    }
+    
+    function saveDrawing() {
+      const canvas = drawingState.canvas;
+      const link = document.createElement('a');
+      link.download = `disegno-${new Date().toISOString().slice(0,10)}-${Date.now()}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      
+      // Show feedback
+      const feedback = $('#feedback');
+      const originalText = feedback.innerHTML;
+      feedback.innerHTML = '🎨 Disegno salvato! 📁';
+      setTimeout(() => {
+        feedback.innerHTML = originalText;
+      }, 2000);
+    }
 
     // ---------- Storage ----------
     const STORAGE_KEY = 'kids_learner_v2';
@@ -421,7 +719,7 @@
     function updateButtonStates() {
       const isRunning = session.running;
       ['#subject', '#level', '#sessionSize', '#profileSelect', '#addProfileBtn', '#newProfileName', '#startBtn'].forEach(sel => $(sel).disabled = isRunning);
-      ['#hintBtn', '#explainBtn', '#flashBtn', '#textAnswer', '#submitTextBtn'].forEach(sel => $(sel).disabled = !isRunning);
+      ['#hintBtn', '#explainBtn', '#flashBtn', '#textAnswer', '#submitTextBtn', '#drawingToggleBtn'].forEach(sel => $(sel).disabled = !isRunning);
     }
 
     function updateProfileImage() {
@@ -465,9 +763,9 @@
         const mode = pick(['it->en','en->it']);
         let q,correct,opts,hint,explain,flashcard;
         if(mode==='it->en'){
-          q = `Traduci in inglese: “${it}”`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0])); hint = `Pensa alla parola inglese che hai imparato per “${it}”`; explain = `Ricorda i suoni e le lettere delle parole inglesi.`; flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`;
+          q = `Traduci in inglese: "${it}"`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0])); hint = `Pensa alla parola inglese che hai imparato per "${it}"`; explain = `Ricorda i suoni e le lettere delle parole inglesi.`; flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`;
         } else {
-          q = `Cosa vuol dire in italiano: “${en}”`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1])); hint = `Prova a ricordare il significato in italiano di "${en}".`; explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`; flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`;
+          q = `Cosa vuol dire in italiano: "${en}"`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1])); hint = `Prova a ricordare il significato in italiano di "${en}".`; explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`; flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`;
         }
         const key = `E:${level}:${en}:${mode}`; return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard };
       },
@@ -548,6 +846,10 @@
       $('#progressBar').style.width = '0%';
       $('#feedback').textContent = '';
       $('#textAnswer').value = '';
+      // Clear canvas when starting new session
+      if (drawingState.canvas) {
+        clearCanvas();
+      }
       updateButtonStates();
       nextQuestion();
       $('#textAnswer').focus();
@@ -601,6 +903,7 @@
         session.index++;
         $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
         if (session.index >= session.size) {
+          session.running = false;
           $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
           $('#options').innerHTML = ''; $('#feedback').textContent = '';
           $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
@@ -758,12 +1061,20 @@
         };
         fileInput.click();
       });
+
+      // Handle window resize for canvas
+      window.addEventListener('resize', () => {
+        if (drawingState.isDrawingBoxOpen) {
+          resizeCanvas();
+        }
+      });
     }
 
     // ---------- App Boot ----------
     initProfiles();
     $('#mathOpsWrap').classList.toggle('hidden', $('#subject').value !== 'Matematica');
     setupEventListeners();
+    initDrawingSystem();
   })();
   </script>
 </body>
