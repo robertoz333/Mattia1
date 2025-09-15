@@ -269,6 +269,7 @@
             </select>
           </span>
           <button id="startBtn" class="bg-green-500 text-white rounded-full px-8 py-3 text-xl animate-pulse">Inizia a Giocare! 🚀</button>
+          <button id="stopSessionBtn" class="bg-red-500 text-white rounded-full px-6 py-3 text-lg hidden">🏠 Torna alle Materie</button>
         </div>
       </div>
 
@@ -290,9 +291,10 @@
             <button id="submitTextBtn" class="bg-blue-500 text-white rounded-xl px-5 py-3" disabled>Invia</button>
           </div>
 
-          <!-- Drawing Toggle Button -->
-          <div class="mt-4 text-center">
+          <!-- Game Controls -->
+          <div class="mt-4 flex flex-wrap justify-center gap-3">
             <button id="drawingToggleBtn" class="bg-purple-500 text-white rounded-full px-6 py-3 text-lg" disabled>🎨 Disegna</button>
+            <button id="nextQuestionBtn" class="bg-orange-500 text-white rounded-full px-6 py-3 text-lg hidden">⏭️ Prossima Domanda</button>
           </div>
 
           <!-- Drawing Box -->
@@ -664,7 +666,7 @@
 
     // ---------- State ----------
     let app = load();
-    let session = { running: false, size: 10, index: 0, current: null };
+    let session = { running: false, size: 10, index: 0, current: null, waitingForNext: false };
 
     // ---------- UI Management ----------
     function initProfiles() {
@@ -718,8 +720,20 @@
 
     function updateButtonStates() {
       const isRunning = session.running;
-      ['#subject', '#level', '#sessionSize', '#profileSelect', '#addProfileBtn', '#newProfileName', '#startBtn'].forEach(sel => $(sel).disabled = isRunning);
-      ['#hintBtn', '#explainBtn', '#flashBtn', '#textAnswer', '#submitTextBtn', '#drawingToggleBtn'].forEach(sel => $(sel).disabled = !isRunning);
+      const isWaiting = session.waitingForNext;
+      
+      // Controls that are disabled during session
+      ['#subject', '#level', '#sessionSize', '#profileSelect', '#addProfileBtn', '#newProfileName'].forEach(sel => $(sel).disabled = isRunning);
+      
+      // Start/Stop session buttons
+      $('#startBtn').disabled = isRunning;
+      $('#stopSessionBtn').classList.toggle('hidden', !isRunning);
+      
+      // Game interaction buttons
+      ['#hintBtn', '#explainBtn', '#flashBtn', '#textAnswer', '#submitTextBtn', '#drawingToggleBtn'].forEach(sel => $(sel).disabled = !isRunning || isWaiting);
+      
+      // Next question button (only shown when waiting)
+      $('#nextQuestionBtn').classList.toggle('hidden', !isWaiting);
     }
 
     function updateProfileImage() {
@@ -842,7 +856,7 @@
     }
 
     function startSession() {
-      session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null };
+      session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null, waitingForNext: false };
       $('#progressBar').style.width = '0%';
       $('#feedback').textContent = '';
       $('#textAnswer').value = '';
@@ -853,6 +867,27 @@
       updateButtonStates();
       nextQuestion();
       $('#textAnswer').focus();
+    }
+
+    function stopSession() {
+      session.running = false;
+      session.waitingForNext = false;
+      session.current = null;
+      
+      // Reset UI to initial state
+      $('#question').innerHTML = 'Premi "Inizia a Gioca!" per iniziare.';
+      $('#options').innerHTML = '';
+      $('#feedback').textContent = '';
+      $('#helpBox').innerHTML = 'Inizia una partita per ricevere aiuto!';
+      $('#textAnswer').value = '';
+      $('#progressBar').style.width = '0%';
+      
+      // Close drawing box if open
+      if (drawingState.isDrawingBoxOpen) {
+        toggleDrawingBox();
+      }
+      
+      updateButtonStates();
     }
 
     function renderQuestion(pak){
@@ -878,6 +913,10 @@
       $('#textAnswer').disabled = !session.running;
       $('#submitTextBtn').disabled = !session.running;
       $('#textAnswer').value = '';
+      
+      // Reset waiting state
+      session.waitingForNext = false;
+      updateButtonStates();
     }
 
     function nextQuestion() {
@@ -899,22 +938,29 @@
     }
 
     function finishOrContinue() {
-      setTimeout(() => {
-        session.index++;
-        $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
-        if (session.index >= session.size) {
-          session.running = false;
-          $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
-          $('#options').innerHTML = ''; $('#feedback').textContent = '';
-          $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
-          updateButtonStates();
-        } else {
-          session.running = true; // nuova domanda
-          updateButtonStates();
-          nextQuestion();
-          $('#textAnswer').focus();
-        }
-      }, 1200);
+      session.index++;
+      $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
+      
+      if (session.index >= session.size) {
+        session.running = false;
+        session.waitingForNext = false;
+        $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
+        $('#options').innerHTML = ''; 
+        $('#feedback').textContent = '';
+        $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
+        updateButtonStates();
+      } else {
+        // Enable "Next Question" mode
+        session.waitingForNext = true;
+        updateButtonStates();
+        
+        // Auto-advance after delay or wait for manual click
+        setTimeout(() => {
+          if (session.waitingForNext && session.running) {
+            nextQuestion();
+          }
+        }, 3000); // Auto-advance after 3 seconds
+      }
     }
 
     function normalize(val){ return String(val).trim().toLowerCase(); }
@@ -928,23 +974,19 @@
     }
 
     function selectAnswerViaChoice(el, value) {
-      if (!session.running) return;
-      session.running = false; // blocca
+      if (!session.running || session.waitingForNext) return;
       lockChoices();
       const correct = normalize(value) === normalize(session.current.correct);
       el.classList.add(correct ? 'correct' : 'wrong');
-      updateButtonStates();
       handleAnswerResult(correct);
     }
 
     function selectAnswerViaText() {
-      if (!session.running) return;
+      if (!session.running || session.waitingForNext) return;
       const input = $('#textAnswer');
       const val = input.value;
       if (!val.trim()) { input.focus(); return; }
-      session.running = false; // blocca
       lockChoices();
-      updateButtonStates();
       const correct = normalize(val) === normalize(session.current.correct);
       // evidenzia opzione corretta se presente
       $$('#options .option').forEach(o => {
@@ -958,6 +1000,13 @@
     // ---------- Event Listeners Setup ----------
     function setupEventListeners() {
       $('#startBtn').addEventListener('click', startSession);
+      $('#stopSessionBtn').addEventListener('click', stopSession);
+      $('#nextQuestionBtn').addEventListener('click', () => {
+        if (session.waitingForNext && session.running) {
+          nextQuestion();
+        }
+      });
+      
       $('#hintBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '💡 <b>Aiuto:</b> ' + session.current.hint; });
       $('#explainBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '📖 <b>Spiegazione:</b> ' + session.current.explain; });
       $('#flashBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '🃏 <b>Flashcard:</b><br>' + session.current.flashcard; });
