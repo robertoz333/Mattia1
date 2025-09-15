@@ -268,6 +268,7 @@
               <option>5</option><option selected>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option>
             </select>
           </span>
+          <button id="weeklyHomeworkBtn" class="bg-sky-400 text-white rounded-full px-8 py-3 text-lg">Compiti settimanali 📚</button>
           <button id="startBtn" class="bg-green-500 text-white rounded-full px-8 py-3 text-xl animate-pulse">Inizia a Giocare! 🚀</button>
           <button id="stopSessionBtn" class="bg-red-500 text-white rounded-full px-6 py-3 text-lg hidden">🏠 Torna alle Materie</button>
         </div>
@@ -377,6 +378,7 @@
 
       <div class="flex justify-center mt-8">
         <button id="progressBtn" class="bg-sky-400 text-white rounded-full px-8 py-3 text-lg">Mostra i miei progressi 📈</button>
+        <!-- Nuovo bottone per i compiti settimanali -->
       </div>
     </div>
   </main>
@@ -387,6 +389,145 @@
       <div id="progressSummary" class="text-lg"></div>
       <div class="text-center mt-6">
         <button class="bg-red-400 text-white rounded-full px-8 py-3 text-lg" onclick="this.closest('dialog').close()">Chiudi ❌</button>
+      </div>
+    </div>
+  </dialog>
+  <!-- Dialogo per Compiti Settimanali -->
+  <dialog id="homeworkDialog">
+    <div class="bg-sky-100 p-8 rounded-3xl shadow-xl border-4 border-blue-200">
+      <h3 class="text-3xl font-bold text-center mb-6">📚 Compiti Settimanali</h3>
+      <div id="homeworkFields" class="grid grid-cols-1 gap-4">
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 1">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 2">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 3">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 4">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 5">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 6">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 7">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 8">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 9">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 10">
+          <span class="spelled text-lg font-bold text-blue-700"></span>
+        </div>
+      </div>
+      <!-- Sezione frasi di esempio: inizialmente nascosta -->
+      <div id="exampleSection" class="hidden mt-6">
+        <h4 class="text-xl font-bold mb-4">📗 Frasi di esempio</h4>
+        <div id="exampleFields" class="grid grid-cols-1 gap-4">
+          <!-- 10 frasi di esempio per ciascuna parola -->
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="exampleSentence text-base text-slate-700"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Sezione di verifica: inizialmente nascosta -->
+      <div id="verifySection" class="hidden mt-6">
+        <h4 class="text-xl font-bold mb-4">✏️ Verifica le parole</h4>
+        <div id="verifyFields" class="grid grid-cols-1 gap-4">
+          <!-- 10 campi per la verifica con risultati -->
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 1">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 2">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 3">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 4">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 5">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 6">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 7">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 8">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 9">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 10">
+            <span class="verifyResult text-lg font-bold"></span>
+          </div>
+        </div>
+        <div class="text-center mt-4">
+          <button id="checkWordsBtn" class="bg-blue-500 text-white rounded-full px-6 py-3 text-lg">Controlla</button>
+        </div>
+      </div>
+      <div class="text-center mt-6 flex flex-wrap justify-center gap-3">
+        <button id="spellPronounceBtn" class="bg-green-400 text-white rounded-full px-6 py-3 text-lg">📢 Spelling & Pronuncia</button>
+        <button class="bg-red-400 text-white rounded-full px-6 py-3 text-lg" onclick="this.closest('dialog').close()">Chiudi ❌</button>
       </div>
     </div>
   </dialog>
@@ -1090,6 +1231,106 @@
       $('#zoomOutBtn').addEventListener('click', () => { if (currentScale > MIN_ZOOM) { currentScale -= ZOOM_STEP; updateZoom(); } });
       updateZoom();
 
+      // Nuovi event listener per Compiti Settimanali
+      // L'handler per il bottone dei compiti settimanali è definito più sotto,
+      // dove gestiamo anche il reset dello stato del dialogo.
+      // Helper to pronounce a single word in the appropriate language. It will detect
+      // whether the word contains Italian accented characters to choose the voice.
+      function speakWord(word) {
+        if (!word) return;
+        const englishWanted = (() => {
+          // If the word contains only ASCII letters without accented vowels, consider it English
+          const hasItalianChar = /[àèìòùé]/i.test(word);
+          const isAsciiLetters = /^[A-Za-z]+$/.test(word);
+          return isAsciiLetters && !hasItalianChar;
+        })();
+        const utter = new SpeechSynthesisUtterance(word);
+        // Set desired language code; the actual voice will be selected below
+        utter.lang = englishWanted ? 'en-US' : 'it-IT';
+        try {
+          // Attempt to select an appropriate voice by matching the language prefix
+          const voices = window.speechSynthesis.getVoices();
+          let selectedVoice = null;
+          if (voices && voices.length) {
+            const targetPrefix = englishWanted ? 'en' : 'it';
+            selectedVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(targetPrefix));
+          }
+          if (selectedVoice) {
+            utter.voice = selectedVoice;
+          }
+        } catch (e) {
+          // In case getVoices is unavailable, proceed without selecting voice
+        }
+        // Cancel any ongoing speech before starting a new one
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
+        window.speechSynthesis.speak(utter);
+      }
+
+      // When clicking the Spelling & Pronuncia button, update the spelling for each
+      // provided word and attach a click handler so that only the clicked word is
+      // spoken. No words are pronounced automatically to avoid reading all entries
+      // at once.
+      $('#spellPronounceBtn').addEventListener('click', () => {
+        const fields = $$('#homeworkFields .homeworkWord');
+        const spelleds = $$('#homeworkFields .spelled');
+        // Reset the current homework words array
+        currentHomeworkWords = [];
+        fields.forEach((input, i) => {
+          const word = (input.value || '').trim();
+          const target = spelleds[i];
+          // Save the word for later verification (even if empty)
+          currentHomeworkWords.push(word);
+          if (word) {
+            // Disable original field so it can't be changed during verification
+            input.disabled = true;
+            // Build spelled-out representation (e.g. C - A - N - E)
+            target.textContent = word.toUpperCase().split('').join(' - ');
+            // Store the original word as a data attribute for later retrieval
+            target.dataset.word = word;
+            // Make the spelled text look clickable
+            target.style.cursor = 'pointer';
+            // Remove any previous click handler before assigning a new one
+            target.onclick = null;
+            // Attach a click handler to pronounce only this word
+            target.addEventListener('click', () => {
+              speakWord(target.dataset.word);
+            });
+          } else {
+            // If no word provided, keep spelled area empty
+            target.textContent = '';
+            target.dataset.word = '';
+            target.style.cursor = 'default';
+            target.onclick = null;
+          }
+        });
+        // Generate example sentences for each word and display them
+        const exampleSpans = $$('#exampleFields .exampleSentence');
+        exampleSpans.forEach((span, idx) => {
+          const w = (currentHomeworkWords[idx] || '').trim();
+          if (w) {
+            // Determina la lingua della parola e seleziona il set di template corretto
+            const lang = detectLang(w);
+            const templates = lang === 'en' ? EXAMPLE_TEMPLATES_EN : EXAMPLE_TEMPLATES_IT;
+            // Seleziona un template in base all'indice per diversificare le frasi
+            const template = templates[idx % templates.length];
+            span.textContent = template.replace(/\[word\]/g, w);
+          } else {
+            span.textContent = '';
+          }
+        });
+        // Show the example section
+        $('#exampleSection').classList.remove('hidden');
+
+        // Show the verification section so the user can retype the words
+        const verifySection = document.getElementById('verifySection');
+        verifySection.classList.remove('hidden');
+        // Clear any existing input values and results from previous runs
+        $$('#verifyFields .verifyWord').forEach(input => { input.value = ''; });
+        $$('#verifyFields .verifyResult').forEach(span => { span.textContent = ''; span.classList.remove('text-green-600','text-red-600'); });
+      });
+
       // Aggiunta della funzionalità per caricare l'immagine del profilo
       $('#profileImagePlaceholder').addEventListener('click', () => {
         const fileInput = document.createElement('input');
@@ -1109,6 +1350,91 @@
           }
         };
         fileInput.click();
+      });
+
+      // Verifica delle parole digitate: confronta le parole inserite nel secondo box con quelle originali.
+      $('#checkWordsBtn').addEventListener('click', () => {
+        const verifyInputs = $$('#verifyFields .verifyWord');
+        const verifyResults = $$('#verifyFields .verifyResult');
+        verifyInputs.forEach((input, index) => {
+          const userWord = (input.value || '').trim();
+          const origWord = (currentHomeworkWords[index] || '').trim();
+          const resSpan = verifyResults[index];
+          // If there was no original word, clear the result
+          if (!origWord) {
+            resSpan.textContent = '';
+            resSpan.classList.remove('text-green-600','text-red-600');
+          } else {
+            const isCorrect = userWord && userWord.toLowerCase() === origWord.toLowerCase();
+            resSpan.textContent = isCorrect ? 'Giusto' : 'Errato';
+            // Remove previous color classes
+            resSpan.classList.remove('text-green-600','text-red-600');
+            // Apply appropriate Tailwind color class
+            resSpan.classList.add(isCorrect ? 'text-green-600' : 'text-red-600');
+          }
+        });
+      });
+
+      // ---------------------- Compiti Settimanali ----------------------
+      // Keep track of the original homework words for the verification phase
+      let currentHomeworkWords = [];
+
+      // Template di frasi di esempio separate per italiano e inglese. Ogni frase contiene il segnaposto [word] che verrà sostituito con la parola inserita.
+      const EXAMPLE_TEMPLATES_IT = [
+        'Ieri ho visto la parola "[word]" in un libro e ho imparato cosa significa.',
+        'A scuola abbiamo decorato la parola "[word]" sul quaderno con i colori.',
+        'Mi piace leggere storie dove si parla di "[word]" in modo semplice.',
+        'La maestra ci ha spiegato che "[word]" è una parola importante da conoscere.',
+        'A casa ho inventato una storia con "[word]" che ho raccontato alla mia famiglia.',
+        'In un sogno ho visto "[word]" e mi sono svegliato felice.',
+        'Quando scrivi "[word]", ricordati di tutte le lettere e pronunciale bene.',
+        'Se ripeti "[word]" ad alta voce, diventerai sempre più bravo a ricordarla.',
+        'Abbiamo recitato una poesia che parlava di "[word]" e mi è piaciuta molto.',
+        'Pensare a "[word]" mi fa venire in mente qualcosa di bello e divertente.'
+      ];
+
+      const EXAMPLE_TEMPLATES_EN = [
+        'Yesterday I saw the word "[word]" in a book and learned what it means.',
+        'At school we decorated the word "[word]" in our notebook with colors.',
+        'I like to read stories that talk about "[word]" in a simple way.',
+        'The teacher told us that "[word]" is an important word to know.',
+        'At home I made up a story with "[word]" and told it to my family.',
+        'In a dream I saw "[word]" and woke up feeling happy.',
+        'When you write "[word]", remember all the letters and say them clearly.',
+        'If you repeat "[word]" out loud, you will get better at remembering it.',
+        'We recited a poem that talked about "[word]" and I liked it a lot.',
+        'Thinking of "[word]" makes me imagine something nice and fun.'
+      ];
+
+      // Funzione per stimare la lingua di una parola. Restituisce 'en' per l'inglese o 'it' per l'italiano.
+      function detectLang(word) {
+        const w = (word || '').toLowerCase();
+        // Se contiene caratteri accentati, consideriamo italiano
+        if (/[àèéìòù]/.test(w)) return 'it';
+        // Alcune sequenze di lettere sono tipiche dell'inglese (double vowels, digrammi, suffissi).
+        const englishPattern = /(ee|oo|th|sh|ch|ck|ph|ing|tion|ed|er|ly|y)$/;
+        if (englishPattern.test(w)) return 'en';
+        // Se finisce con una consonante (non vocale), è più probabile che sia inglese
+        if (/[^aeiou]$/.test(w)) return 'en';
+        // Altrimenti, assumiamo che sia italiano
+        return 'it';
+      }
+
+      // Show the homework modal
+      $('#weeklyHomeworkBtn').addEventListener('click', () => {
+        const dlg = document.getElementById('homeworkDialog');
+        dlg.showModal();
+        // Reset verify and example sections when the dialog is opened
+        $('#verifySection').classList.add('hidden');
+        $$('#verifyFields .verifyWord').forEach(input => { input.value = ''; });
+        $$('#verifyFields .verifyResult').forEach(span => { span.textContent = ''; span.classList.remove('text-green-600','text-red-600'); });
+        $('#exampleSection').classList.add('hidden');
+        $$('#exampleFields .exampleSentence').forEach(span => { span.textContent = ''; });
+        // Re-enable homework inputs and clear spelled text
+        const fields = $$('#homeworkFields .homeworkWord');
+        const spelleds = $$('#homeworkFields .spelled');
+        fields.forEach(input => { input.disabled = false; });
+        spelleds.forEach(span => { span.textContent = ''; span.dataset.word = ''; span.style.cursor = 'default'; span.onclick = null; });
       });
 
       // Handle window resize for canvas
