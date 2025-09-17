@@ -199,11 +199,9 @@
   </style>
 </head>
 <body class="text-slate-800">
-  <!-- Header -->
   <header class="p-6 bg-sky-300 text-white shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-between">
       <div class="flex items-center gap-4">
-        <!-- Spazio per la foto del bimbo -->
         <div class="flex items-center gap-3">
           <div class="image-placeholder" id="profileImagePlaceholder">
             👤
@@ -228,10 +226,8 @@
       </div>
     </div>
   </header>
-  <!-- Main Content -->
   <main class="max-w-7xl mx-auto p-4 md:p-8">
     <div class="bg-card shadow-card rounded-3xl p-6">
-      <!-- Game Options -->
       <div class="flex flex-col md:flex-row gap-4 mb-6">
         <div class="flex flex-wrap items-center gap-4">
           <span class="tag flex items-center gap-2 p-2 rounded-full text-lg">
@@ -268,47 +264,38 @@
               <option>5</option><option selected>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option>
             </select>
           </span>
-          <button id="weeklyHomeworkBtn" class="bg-sky-400 text-white rounded-full px-8 py-3 text-lg">Compiti settimanali 📚</button>
           <button id="startBtn" class="bg-green-500 text-white rounded-full px-8 py-3 text-xl animate-pulse">Inizia a Giocare! 🚀</button>
           <button id="stopSessionBtn" class="bg-red-500 text-white rounded-full px-6 py-3 text-lg hidden">🏠 Torna alle Materie</button>
         </div>
       </div>
 
-      <!-- Progress Bar -->
       <div class="h-4 bg-sky-200 rounded-full overflow-hidden my-6">
         <div id="progressBar" class="h-full bg-green-400 progress-bar rounded-full" style="width:0%"></div>
       </div>
 
-      <!-- Question & Help -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white shadow-md rounded-2xl p-6">
           <h3 class="text-2xl font-bold mb-4 animate-slideIn">🧩 Domanda</h3>
           <div id="question" class="min-h-[150px] flex items-center justify-center p-4 border-4 border-dashed border-blue-200 rounded-xl text-2xl text-center animate-fadeIn">Premi "Inizia a Gioca!" per iniziare.</div>
           <div class="options grid gap-4 mt-6" id="options"></div>
 
-          <!-- Campo risposta testuale + invio -->
           <div id="textAnswerWrap" class="mt-4 flex items-center gap-2">
             <input id="textAnswer" type="text" class="flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Scrivi la tua risposta e premi Invio…" disabled>
             <button id="submitTextBtn" class="bg-blue-500 text-white rounded-xl px-5 py-3" disabled>Invia</button>
           </div>
 
-          <!-- Game Controls -->
           <div class="mt-4 flex flex-wrap justify-center gap-3">
             <button id="drawingToggleBtn" class="bg-purple-500 text-white rounded-full px-6 py-3 text-lg" disabled>🎨 Disegna</button>
             <button id="nextQuestionBtn" class="bg-orange-500 text-white rounded-full px-6 py-3 text-lg hidden">⏭️ Prossima Domanda</button>
           </div>
 
-          <!-- Drawing Box -->
           <div id="drawingBox" class="mt-4 p-4">
             <div class="flex flex-col gap-4">
-              <!-- Canvas -->
               <div class="flex justify-center">
                 <canvas id="drawingCanvas" width="400" height="300"></canvas>
               </div>
               
-              <!-- Drawing Controls -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Color Palette -->
                 <div>
                   <label class="block text-sm font-semibold text-slate-700 mb-2">🎨 Colori:</label>
                   <div class="color-palette">
@@ -323,7 +310,6 @@
                   </div>
                 </div>
                 
-                <!-- Brush Size -->
                 <div>
                   <label class="block text-sm font-semibold text-slate-700 mb-2">✏️ Dimensione pennello:</label>
                   <input type="range" id="brushSize" min="1" max="20" value="3" class="brush-size-slider">
@@ -333,7 +319,6 @@
                 </div>
               </div>
               
-              <!-- Action Buttons -->
               <div class="flex flex-wrap justify-center gap-3">
                 <button id="clearCanvasBtn" class="bg-red-400 text-white rounded-full px-4 py-2 text-sm">🗑️ Cancella tutto</button>
                 <button id="saveDrawingBtn" class="bg-green-400 text-white rounded-full px-4 py-2 text-sm">💾 Salva disegno</button>
@@ -354,7 +339,6 @@
         </div>
       </div>
 
-      <!-- Statistics -->
       <div class="mt-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-center">
           <div class="bg-white rounded-2xl p-5 shadow-inner animate-popIn">
@@ -378,156 +362,15 @@
 
       <div class="flex justify-center mt-8">
         <button id="progressBtn" class="bg-sky-400 text-white rounded-full px-8 py-3 text-lg">Mostra i miei progressi 📈</button>
-        <!-- Nuovo bottone per i compiti settimanali -->
       </div>
     </div>
   </main>
-  <!-- Progress Dialog -->
   <dialog id="progressDialog">
     <div class="bg-sky-100 p-8 rounded-3xl shadow-xl border-4 border-blue-200">
       <h3 class="text-3xl font-bold text-center mb-6">📈 I Tuoi Progressi – <span id="progressDate" class="text-sky-700"></span></h3>
       <div id="progressSummary" class="text-lg"></div>
       <div class="text-center mt-6">
         <button class="bg-red-400 text-white rounded-full px-8 py-3 text-lg" onclick="this.closest('dialog').close()">Chiudi ❌</button>
-      </div>
-    </div>
-  </dialog>
-  <!-- Dialogo per Compiti Settimanali -->
-  <dialog id="homeworkDialog">
-    <div class="bg-sky-100 p-8 rounded-3xl shadow-xl border-4 border-blue-200">
-      <h3 class="text-3xl font-bold text-center mb-6">📚 Compiti Settimanali</h3>
-      <div id="homeworkFields" class="grid grid-cols-1 gap-4">
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 1">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 2">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 3">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 4">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 5">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 6">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 7">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 8">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 9">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-        <div class="flex items-center gap-3">
-          <input type="text" class="homeworkWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Parola 10">
-          <span class="spelled text-lg font-bold text-blue-700"></span>
-        </div>
-      </div>
-      <!-- Sezione frasi di esempio: inizialmente nascosta -->
-      <div id="exampleSection" class="hidden mt-6">
-        <h4 class="text-xl font-bold mb-4">📗 Frasi di esempio</h4>
-        <div id="exampleFields" class="grid grid-cols-1 gap-4">
-          <!-- 10 frasi di esempio per ciascuna parola -->
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span class="exampleSentence text-base text-slate-700"></span>
-          </div>
-        </div>
-      </div>
-      <!-- Sezione di verifica: inizialmente nascosta -->
-      <div id="verifySection" class="hidden mt-6">
-        <h4 class="text-xl font-bold mb-4">✏️ Verifica le parole</h4>
-        <div id="verifyFields" class="grid grid-cols-1 gap-4">
-          <!-- 10 campi per la verifica con risultati -->
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 1">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 2">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 3">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 4">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 5">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 6">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 7">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 8">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 9">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <input type="text" class="verifyWord flex-1 p-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ripeti parola 10">
-            <span class="verifyResult text-lg font-bold"></span>
-          </div>
-        </div>
-        <div class="text-center mt-4">
-          <button id="checkWordsBtn" class="bg-blue-500 text-white rounded-full px-6 py-3 text-lg">Controlla</button>
-        </div>
-      </div>
-      <div class="text-center mt-6 flex flex-wrap justify-center gap-3">
-        <button id="spellPronounceBtn" class="bg-green-400 text-white rounded-full px-6 py-3 text-lg">📢 Spelling & Pronuncia</button>
-        <button class="bg-red-400 text-white rounded-full px-6 py-3 text-lg" onclick="this.closest('dialog').close()">Chiudi ❌</button>
       </div>
     </div>
   </dialog>
@@ -541,10 +384,9 @@
       const d = new Date(isoDate);
       return d.toLocaleDateString('it-IT', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
     };
-    // ISO week string like 2025-W37
     function weekStr(dateObj = new Date()) {
       const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
-      const dayNum = d.getUTCDay() || 7; // Monday=1..Sunday=7
+      const dayNum = d.getUTCDay() || 7;
       d.setUTCDate(d.getUTCDate() + 4 - dayNum);
       const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
       const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
@@ -584,7 +426,6 @@
       drawingState.canvas = $('#drawingCanvas');
       drawingState.ctx = drawingState.canvas.getContext('2d');
       
-      // Set up canvas
       drawingState.ctx.lineCap = 'round';
       drawingState.ctx.lineJoin = 'round';
       drawingState.ctx.strokeStyle = drawingState.currentColor;
@@ -596,10 +437,8 @@
     function setupDrawingEventListeners() {
       const canvas = drawingState.canvas;
       
-      // Drawing Toggle Button
       $('#drawingToggleBtn').addEventListener('click', toggleDrawingBox);
       
-      // Color Palette
       $$('.color-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           $$('.color-btn').forEach(b => b.classList.remove('active'));
@@ -609,26 +448,21 @@
         });
       });
       
-      // Brush Size Slider
       $('#brushSize').addEventListener('input', (e) => {
         drawingState.currentBrushSize = parseInt(e.target.value);
         drawingState.ctx.lineWidth = drawingState.currentBrushSize;
         $('#brushSizeDisplay').textContent = drawingState.currentBrushSize;
       });
       
-      // Clear Canvas Button
       $('#clearCanvasBtn').addEventListener('click', clearCanvas);
       
-      // Save Drawing Button
       $('#saveDrawingBtn').addEventListener('click', saveDrawing);
       
-      // Mouse Events
       canvas.addEventListener('mousedown', startDrawing);
       canvas.addEventListener('mousemove', draw);
       canvas.addEventListener('mouseup', stopDrawing);
       canvas.addEventListener('mouseout', stopDrawing);
       
-      // Touch Events (mobile/tablet)
       canvas.addEventListener('touchstart', handleTouch, { passive: false });
       canvas.addEventListener('touchmove', handleTouch, { passive: false });
       canvas.addEventListener('touchend', stopDrawing);
@@ -643,7 +477,6 @@
         box.classList.add('show');
         $('#drawingToggleBtn').textContent = '❌ Chiudi Disegno';
         $('#drawingToggleBtn').className = 'bg-red-500 text-white rounded-full px-6 py-3 text-lg';
-        // Resize canvas to fit container
         resizeCanvas();
       } else {
         box.classList.remove('show');
@@ -657,40 +490,17 @@
       const container = canvas.parentElement;
       const containerWidth = container.clientWidth;
       const maxWidth = Math.min(400, containerWidth - 40);
-      const ratio = 300 / 400; // height / width
+      const ratio = 300 / 400;
       
       canvas.width = maxWidth;
       canvas.height = maxWidth * ratio;
       canvas.style.width = maxWidth + 'px';
       canvas.style.height = (maxWidth * ratio) + 'px';
       
-      // Re-apply drawing settings
       drawingState.ctx.lineCap = 'round';
       drawingState.ctx.lineJoin = 'round';
       drawingState.ctx.strokeStyle = drawingState.currentColor;
       drawingState.ctx.lineWidth = drawingState.currentBrushSize;
-    }
-    
-    function getMousePos(e) {
-      const rect = drawingState.canvas.getBoundingClientRect();
-      const scaleX = drawingState.canvas.width / rect.width;
-      const scaleY = drawingState.canvas.height / rect.height;
-      
-      return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
-      };
-    }
-    
-    function getTouchPos(e) {
-      const rect = drawingState.canvas.getBoundingClientRect();
-      const scaleX = drawingState.canvas.width / rect.width;
-      const scaleY = drawingState.canvas.height / rect.height;
-      
-      return {
-        x: (e.touches[0].clientX - rect.left) * scaleX,
-        y: (e.touches[0].clientY - rect.top) * scaleY
-      };
     }
     
     function startDrawing(e) {
@@ -699,757 +509,557 @@
       drawingState.ctx.beginPath();
       drawingState.ctx.moveTo(pos.x, pos.y);
     }
-    
+
     function draw(e) {
       if (!drawingState.isDrawing) return;
-      
       const pos = getMousePos(e);
       drawingState.ctx.lineTo(pos.x, pos.y);
       drawingState.ctx.stroke();
     }
     
     function stopDrawing() {
-      if (drawingState.isDrawing) {
-        drawingState.isDrawing = false;
-        drawingState.ctx.beginPath();
-      }
-    }
-    
-    function handleTouch(e) {
-      e.preventDefault();
-      
-      if (e.type === 'touchstart') {
-        drawingState.isDrawing = true;
-        const pos = getTouchPos(e);
-        drawingState.ctx.beginPath();
-        drawingState.ctx.moveTo(pos.x, pos.y);
-      } else if (e.type === 'touchmove' && drawingState.isDrawing) {
-        const pos = getTouchPos(e);
-        drawingState.ctx.lineTo(pos.x, pos.y);
-        drawingState.ctx.stroke();
-      }
+      drawingState.isDrawing = false;
     }
     
     function clearCanvas() {
       drawingState.ctx.clearRect(0, 0, drawingState.canvas.width, drawingState.canvas.height);
     }
-    
+
     function saveDrawing() {
-      const canvas = drawingState.canvas;
-      const link = document.createElement('a');
-      link.download = `disegno-${new Date().toISOString().slice(0,10)}-${Date.now()}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-      
-      // Show feedback
-      const feedback = $('#feedback');
-      const originalText = feedback.innerHTML;
-      feedback.innerHTML = '🎨 Disegno salvato! 📁';
-      setTimeout(() => {
-        feedback.innerHTML = originalText;
-      }, 2000);
+      const dataURL = drawingState.canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataURL;
+      a.download = 'disegno.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
-
-    // ---------- Storage ----------
-    const STORAGE_KEY = 'kids_learner_v2';
-    const defaultSubjects = ['Matematica', 'Inglese', 'Italiano', 'Geografia', 'Scienze', 'Musica'];
-    const baseStats = () => ({ subjectScore: { easy: 0, medium: 0, hard: 0 }, today: {}, weeks: {}, unique: new Set(), uniqueArr: [] });
-
-    function load() {
-      let data;
-      try {
-        const storedData = localStorage.getItem(STORAGE_KEY);
-        if (storedData) {
-          data = JSON.parse(storedData);
-          if (data.version !== 2) throw new Error("Invalid data version");
-        } else {
-          throw new Error("No data found");
-        }
-      } catch (e) {
-        console.warn("Could not load data, starting fresh.", e.message);
-        const id = simpleRandomId();
-        data = {
-          version: 2,
-          currentProfileId: id,
-          profiles: [{ id, name: 'Bimbo', created: new Date().toISOString(), subjects: objFromArray(defaultSubjects, baseStats) }]
-        };
-        save(data);
+    
+    function getMousePos(e) {
+      const rect = drawingState.canvas.getBoundingClientRect();
+      let clientX, clientY;
+      if (e.touches) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
       }
-      // Data migration and validation
-      data.profiles.forEach(p => {
-        defaultSubjects.forEach(s => {
-          p.subjects[s] = p.subjects[s] || baseStats();
-          if (typeof p.subjects[s].subjectScore !== 'object' || p.subjects[s].subjectScore === null) {
-            p.subjects[s].subjectScore = { easy: 0, medium: 0, hard: 0 };
-          }
-          p.subjects[s].unique = new Set(p.subjects[s].uniqueArr || []);
-        });
-      });
-      return data;
+      return {
+        x: (clientX - rect.left) / (rect.right - rect.left) * drawingState.canvas.width,
+        y: (clientY - rect.top) / (rect.bottom - rect.top) * drawingState.canvas.height
+      };
     }
 
-    function save(data) {
-      try {
-        const clone = JSON.parse(JSON.stringify(data));
-        clone.profiles.forEach(p => {
-          defaultSubjects.forEach(s => {
-            if (p.subjects[s] && p.subjects[s].unique) {
-              p.subjects[s].uniqueArr = Array.from(p.subjects[s].unique);
-              delete p.subjects[s].unique;
-            }
-          });
-        });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(clone));
-      } catch (e) { console.error("Failed to save data:", e); }
+    function handleTouch(e) {
+      e.preventDefault();
+      const canvas = drawingState.canvas;
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent(
+        {
+          'touchstart': 'mousedown',
+          'touchmove': 'mousemove',
+          'touchend': 'mouseup'
+        }[e.type],
+        {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        }
+      );
+      canvas.dispatchEvent(mouseEvent);
     }
 
-    function objFromArray(arr, fn) { const o = {}; arr.forEach(k => o[k] = fn()); return o; }
+    // ---------- Data & State ----------
+    const DATA = {
+      Matematica: {
+        easy: {
+          questions: [
+            {q: "Qual è il risultato di 2 + 3?", a: "5", options: ["4", "5", "6", "7"]},
+            {q: "Quanto fa 5 - 1?", a: "4", options: ["3", "4", "5", "6"]},
+            {q: "Calcola 10 + 2", a: "12", options: ["11", "12", "13", "14"]},
+            {q: "Quanto fa 8 - 3?", a: "5", options: ["4", "5", "6", "7"]},
+            {q: "Calcola 4 + 4", a: "8", options: ["7", "8", "9", "10"]},
+            {q: "Quanto fa 9 - 2?", a: "7", options: ["6", "7", "8", "9"]},
+            {q: "Calcola 6 + 1", a: "7", options: ["5", "6", "7", "8"]},
+            {q: "Quanto fa 7 - 4?", a: "3", options: ["2", "3", "4", "5"]},
+            {q: "Quanto fa 3 + 6?", a: "9", options: ["8", "9", "10", "11"]},
+            {q: "Calcola 15 - 5", a: "10", options: ["9", "10", "11", "12"]}
+          ]
+        },
+        medium: {
+          questions: [
+            {q: "Quanto fa 5 x 6?", a: "30", options: ["25", "30", "35", "40"]},
+            {q: "Calcola 20 ÷ 4", a: "5", options: ["4", "5", "6", "7"]},
+            {q: "Risultato di 7 x 3", a: "21", options: ["18", "21", "24", "28"]},
+            {q: "Quanto fa 45 ÷ 9?", a: "5", options: ["4", "5", "6", "7"]},
+            {q: "Calcola 8 x 8", a: "64", options: ["56", "64", "72", "80"]},
+            {q: "Quanto fa 63 ÷ 7?", a: "9", options: ["8", "9", "10", "11"]},
+            {q: "Risultato di 9 x 4", a: "36", options: ["32", "36", "40", "45"]},
+            {q: "Quanto fa 56 ÷ 8?", a: "7", options: ["6", "7", "8", "9"]},
+            {q: "Calcola 12 x 5", a: "60", options: ["50", "55", "60", "65"]},
+            {q: "Quanto fa 81 ÷ 9?", a: "9", options: ["8", "9", "10", "11"]}
+          ]
+        },
+        hard: {
+          questions: [
+            {q: "Quanto fa (4 + 5) x 3?", a: "27", options: ["18", "21", "24", "27"]},
+            {q: "Calcola 100 - (10 x 5)", a: "50", options: ["40", "50", "60", "70"]},
+            {q: "Risultato di 7 + 8 x 2", a: "23", options: ["30", "23", "17", "15"]},
+            {q: "Quanto fa (50 ÷ 5) - 2?", a: "8", options: ["6", "8", "10", "12"]},
+            {q: "Calcola 3 x (9 - 4)", a: "15", options: ["15", "18", "21", "24"]},
+            {q: "Quanto fa 4² - 5?", a: "11", options: ["9", "11", "13", "16"]},
+            {q: "Risultato di (60 / 6) + 10", a: "20", options: ["18", "19", "20", "21"]},
+            {q: "Quanto fa 30 ÷ (2 x 3)?", a: "5", options: ["4", "5", "6", "7"]},
+            {q: "Calcola 15 + 5 x 2", a: "25", options: ["40", "25", "20", "17"]},
+            {q: "Quanto fa 70 - 7 x 7?", a: "21", options: ["21", "35", "42", "49"]}
+          ]
+        }
+      },
+      Italiano: {
+        easy: {
+          questions: [
+            {q: "Quale animale fa 'bau bau'?", a: "cane", type: "text", hint: "È il migliore amico dell'uomo."},
+            {q: "Come si chiama il nostro pianeta?", a: "Terra", type: "text", hint: "È il terzo pianeta dal Sole."},
+            {q: "Quale parola è un nome?", a: "tavolo", options: ["bello", "mangiare", "tavolo", "veloce"]},
+            {q: "Completa la frase: 'Il gatto...'", a: "miagola", options: ["abbaia", "miagola", "canta", "ride"]},
+            {q: "Quale parola è il contrario di 'grande'?", a: "piccolo", options: ["alto", "forte", "piccolo", "largo"]}
+          ]
+        },
+        medium: {
+          questions: [
+            {q: "Qual è il sinonimo di 'allegro'?", a: "felice", type: "text", hint: "Sinonimo di contento."},
+            {q: "In quale verso è scritto il Vangelo?", a: "prosa", options: ["poesia", "prosa", "rima", "strofa"]},
+            {q: "Quale di queste è una congiunzione?", a: "e", options: ["sul", "che", "e", "perché"]},
+            {q: "Qual è il plurale di 'città'?", a: "città", options: ["città", "cittade", "citti", "cittai"]},
+            {q: "Correggi l'errore: 'Oggi e bel tempo'", a: "Oggi è bel tempo", type: "text", hint: "C'è un accento da aggiungere."}
+          ]
+        },
+        hard: {
+          questions: [
+            {q: "Quale figura retorica è 'Il sole ride'?", a: "personificazione", type: "text", hint: "Quando si danno caratteristiche umane a oggetti o animali."},
+            {q: "Quale di questi è un verbo al congiuntivo imperfetto?", a: "andasse", options: ["andrà", "andassi", "andava", "andasse"]},
+            {q: "Definisci 'iperbole'", a: "Esagerazione", type: "text", hint: "È un sinonimo di esagerazione."}
+          ]
+        }
+      },
+      Inglese: {
+        easy: {
+          questions: [
+            {q: "Come si dice 'gatto' in inglese?", a: "cat", type: "text", hint: "Ha 3 lettere."},
+            {q: "Come si dice 'cane' in inglese?", a: "dog", type: "text", hint: "Ha 3 lettere."},
+            {q: "What is 'rosso' in English?", a: "red", type: "text", hint: "It rhymes with 'bed'."},
+            {q: "Which one is an animal?", a: "horse", options: ["chair", "table", "horse", "car"]},
+            {q: "What is the English word for 'sole'?", a: "sun", options: ["moon", "star", "sun", "cloud"]}
+          ]
+        },
+        medium: {
+          questions: [
+            {q: "What is the past tense of 'go'?", a: "went", options: ["gone", "goed", "went", "goes"]},
+            {q: "How do you say 'libro' in English?", a: "book", type: "text", hint: "Starts with 'b', ends with 'k'."},
+            {q: "Translate 'Mi piace la pizza' into English", a: "I like pizza", type: "text", hint: "Starts with 'I'."}
+          ]
+        },
+        hard: {
+          questions: [
+            {q: "Fill in the blank: 'I would have ____ (be) there.'", a: "been", type: "text", hint: "Past participle of 'to be'."},
+            {q: "Correct the sentence: 'He don't like milk.'", a: "He doesn't like milk.", type: "text", hint: "The verb needs to be conjugated correctly."}
+          ]
+        }
+      }
+    };
 
-    // ---------- State ----------
-    let app = load();
-    let session = { running: false, size: 10, index: 0, current: null, waitingForNext: false };
+    let sessionState = {
+      currentProfile: null,
+      currentSubject: 'Matematica',
+      currentLevel: 'easy',
+      questions: [],
+      currentQuestionIndex: 0,
+      correctAnswers: 0,
+      totalQuestions: 0,
+      isSessionActive: false,
+      userScores: JSON.parse(localStorage.getItem('userScores')) || {}
+    };
 
-    // ---------- UI Management ----------
+    // ---------- User & Profile Management ----------
     function initProfiles() {
-      const sel = '#profileSelect';
-      const selEl = $(sel);
-      selEl.innerHTML = '';
-      app.profiles.forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name; selEl.appendChild(opt); });
-      selEl.value = app.currentProfileId;
-      updateAllUI();
+      const savedProfile = localStorage.getItem('currentProfile');
+      if (savedProfile) {
+        sessionState.currentProfile = savedProfile;
+      } else {
+        const defaultProfile = 'Amico1';
+        if (!sessionState.userScores[defaultProfile]) {
+          sessionState.userScores[defaultProfile] = { totalScore: 0, todayScore: 0, todayDate: todayStr(), subjectScores: {}, weeklyScores: {} };
+        }
+        sessionState.currentProfile = defaultProfile;
+        localStorage.setItem('currentProfile', defaultProfile);
+        updateScoreDisplay();
+      }
+      loadProfiles();
+      checkTodayScore();
     }
-
-    function updateAllUI() {
-      updateHeaderStats();
-      updateTotalScoresDisplay();
-      updateButtonStates();
+    
+    function loadProfiles() {
+      const profileSelect = $('#profileSelect');
+      profileSelect.innerHTML = '';
+      const profiles = Object.keys(sessionState.userScores);
+      profiles.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        profileSelect.appendChild(option);
+      });
+      profileSelect.value = sessionState.currentProfile;
       updateProfileImage();
     }
-
-    function updateHeaderStats() {
-      const p = getCurrentProfile();
-      const subjData = p.subjects[$('#subject').value] || baseStats();
-      const scores = subjData.subjectScore;
-      const totalScore = (scores.easy || 0) + (scores.medium || 0) + (scores.hard || 0);
-      $('#subjectScore').textContent = totalScore;
-      updateTodayKpis();
+    
+    function addProfile() {
+      const newName = $('#newProfileName').value.trim();
+      if (newName && !sessionState.userScores[newName]) {
+        sessionState.userScores[newName] = { totalScore: 0, todayScore: 0, todayDate: todayStr(), subjectScores: {}, weeklyScores: {} };
+        sessionState.currentProfile = newName;
+        localStorage.setItem('userScores', JSON.stringify(sessionState.userScores));
+        localStorage.setItem('currentProfile', newName);
+        loadProfiles();
+        $('#newProfileName').value = '';
+        updateScoreDisplay();
+      }
     }
-
-    function getCurrentProfile() {
-      return app.profiles.find(p => p.id === app.currentProfileId) || app.profiles[0];
+    
+    function switchProfile() {
+      sessionState.currentProfile = $('#profileSelect').value;
+      localStorage.setItem('currentProfile', sessionState.currentProfile);
+      updateProfileImage();
+      updateScoreDisplay();
+      checkTodayScore();
     }
-
-    function updateTotalScoresDisplay() {
-      const container = $('#totalScoresBySubject');
-      const profile = getCurrentProfile();
-      container.innerHTML = '';
-      defaultSubjects.forEach(subject => {
-        const subjScores = (profile.subjects[subject] || baseStats()).subjectScore;
-        const total = (subjScores.easy || 0) + (subjScores.medium || 0) + (subjScores.hard || 0);
-        container.innerHTML += `
-          <div class="bg-white rounded-2xl p-3 shadow-inner animate-popIn">
-            <span class="text-base font-semibold text-sky-800">${subject}</span><br>
-            <b class="text-2xl font-bold text-blue-600">${total}</b>
-            <div class="text-xs text-slate-500 mt-1 grid grid-cols-3 gap-1">
-              <span>F: <b class="text-green-600">${subjScores.easy || 0}</b></span>
-              <span>M: <b class="text-orange-500">${subjScores.medium || 0}</b></span>
-              <span>D: <b class="text-red-600">${subjScores.hard || 0}</b></span>
-            </div>
-          </div>`;
-      });
+    
+    function checkTodayScore() {
+      const profile = sessionState.userScores[sessionState.currentProfile];
+      if (profile && profile.todayDate !== todayStr()) {
+        profile.todayScore = 0;
+        profile.todayCount = 0;
+        profile.todayDate = todayStr();
+        saveScores();
+      }
     }
-
-    function updateButtonStates() {
-      const isRunning = session.running;
-      const isWaiting = session.waitingForNext;
-      
-      // Controls that are disabled during session
-      ['#subject', '#level', '#sessionSize', '#profileSelect', '#addProfileBtn', '#newProfileName'].forEach(sel => $(sel).disabled = isRunning);
-      
-      // Start/Stop session buttons
-      $('#startBtn').disabled = isRunning;
-      $('#stopSessionBtn').classList.toggle('hidden', !isRunning);
-      
-      // Game interaction buttons
-      ['#hintBtn', '#explainBtn', '#flashBtn', '#textAnswer', '#submitTextBtn', '#drawingToggleBtn'].forEach(sel => $(sel).disabled = !isRunning || isWaiting);
-      
-      // Next question button (only shown when waiting)
-      $('#nextQuestionBtn').classList.toggle('hidden', !isWaiting);
-    }
-
+    
     function updateProfileImage() {
-      const profile = getCurrentProfile();
+      const profile = sessionState.userScores[sessionState.currentProfile];
       const placeholder = $('#profileImagePlaceholder');
-      const image = $('#profileImage');
-      
-      if (profile.image) {
-        image.src = profile.image;
-        image.classList.remove('hidden');
+      const img = $('#profileImage');
+      if (profile && profile.image) {
+        img.src = profile.image;
+        img.classList.remove('hidden');
         placeholder.classList.add('hidden');
       } else {
-        image.classList.add('hidden');
+        img.classList.add('hidden');
         placeholder.classList.remove('hidden');
       }
     }
 
-    // ---------- Generators ----------
-    function uniqueKeyGuard(profile, subject, key){ const s = profile.subjects[subject]; if(s.unique.has(key)) return false; s.unique.add(key); if(s.unique.size > 200) s.unique = new Set(Array.from(s.unique).slice(-200)); return true; }
-    const Generators = {
-      Matematica(level){
-        const enabled = $$('.mathop:checked').map(i=>i.value);
-        const op = pick(enabled.length?enabled:['add','sub','mul','div']);
-        const ranges = {easy:[1,10], medium:[5,20], hard:[10,50]};
-        const [a,b] = (function(){
-          const [min,max]=ranges[level];
-          if(op==='div'){ const divisor = rand(min, Math.max(min,Math.floor(max/2))); const quotient = rand(min, max>=30?10:max); return [divisor*quotient, divisor]; }
-          return [rand(min,max), rand(min,max)];
-        })();
-        const text = {add:`${a} + ${b} = ?`, sub:`${a} − ${b} = ?`, mul:`${a} × ${b} = ?`, div:`${a} ÷ ${b} = ?`}[op];
-        const answer = {add:a+b, sub:a-b, mul:a*b, div:Math.floor(a/b)}[op];
-        const key = `M:${level}:${op}:${a}:${b}`;
-        return { ok: (p)=>uniqueKeyGuard(p,'Matematica',key), q:text, options: makeNumberOptions(answer, level), correct: String(answer), hint: `Pensa ad aggiungere 👆 o togliere 👇 i numeri.`, explain: `Ricorda le regole di ${op}: la ${op==='add'?'somma':op==='sub'?'sottrazione':op==='mul'?'moltiplicazione':'divisione'} tra due numeri.`, flashcard: `1️⃣ Scrivi il primo numero.<br>2️⃣ Esegui l'operazione.<br>3️⃣ Scrivi il risultato.` };
-      },
-      Inglese(level){
-        const wordsEasy = [['cat','gatto'],['dog','cane'],['house','casa'],['sun','sole'],['book','libro'],['car','auto'],['apple','mela'],['ball','palla'],['tree','albero'],['bird','uccello']];
-        const wordsMed = [['family','famiglia'],['friend','amico'],['beautiful','bello'],['together','insieme'],['happy','felice'],['water','acqua'],['food','cibo'],['school','scuola'],['teacher','insegnante'],['student','studente']];
-        const wordsHard = [['thought','pensiero'],['tomorrow','domani'],['usually','di solito'],['question','domanda'],['answer','risposta'],['develop','sviluppare'],['community','comunità'],['knowledge','conoscenza'],['important','importante'],['different','diverso']];
-        const bank = level==='easy'?wordsEasy:level==='medium'?wordsMed:wordsHard;
-        const [en,it] = pick(bank);
-        const mode = pick(['it->en','en->it']);
-        let q,correct,opts,hint,explain,flashcard;
-        if(mode==='it->en'){
-          q = `Traduci in inglese: "${it}"`; correct = en; opts = makeTextOptions(correct, bank.map(x=>x[0])); hint = `Pensa alla parola inglese che hai imparato per "${it}"`; explain = `Ricorda i suoni e le lettere delle parole inglesi.`; flashcard = `🇮🇹 → 🇬🇧\nGuarda la parola in italiano e prova a ricordare la sua traduzione.`;
-        } else {
-          q = `Cosa vuol dire in italiano: "${en}"`; correct = it; opts = makeTextOptions(correct, bank.map(x=>x[1])); hint = `Prova a ricordare il significato in italiano di "${en}".`; explain = `Ricorda le parole italiane che corrispondono alle parole inglesi.`; flashcard = `🇬🇧 → 🇮🇹\nGuarda la parola in inglese e prova a ricordare la sua traduzione.`;
-        }
-        const key = `E:${level}:${en}:${mode}`; return { ok:(p)=>uniqueKeyGuard(p,'Inglese',key), q, options:opts, correct, hint, explain, flashcard };
-      },
-      Italiano(level){
-        const modes = ['articolo','vocale','plurale','aggettivo']; const mode = pick(modes);
-        if(mode==='articolo'){
-          const nouns=[["___ albero","l'"],["___ zaino","lo "],["___ scuola","la "],["___ ombrello","l'"],["___ gatto","il "],["___ tigre","la "]];
-          const [phrase, art] = pick(nouns); const opts = makeTextOptions(art.trim(), ['il','lo','la',"l'"]); return pack('Completa con la parolina giusta: '+phrase, art.trim(), opts, 'Guarda la prima lettera della parola dopo.','Ricorda le regole per usare gli articoli determinativi.','L\'articolo determinativo accompagna il nome.');
-        }
-        if(mode==='vocale'){
-          const letter = pick('aeiou'.split('')); const opts = makeTextOptions('vocale',['vocale','consonante']); return pack(`La letterina "${letter}" è una…`, 'vocale', opts, 'Quando pronunci il suono, l\'aria esce libera dalla bocca.', 'Le vocali sono A, E, I, O, U.');
-        }
-        if(mode==='plurale'){
-          const words=[["libro","libri"],["mela","mele"],["amico","amici"],["palla","palle"],["fiore","fiori"]]; const [sing,plu]=pick(words); const q=`Qual è il plurale di "${sing}"?`; const opts = makeTextOptions(plu, words.map(x=>x[1])); return pack(q,plu,opts,'Cambia l\'ultima letterina della parola.','Ricorda come si forma il plurale dei nomi.','Se il nome finisce con -o, il plurale è -i. Se finisce con -a, è -e.');
-        }
-        if(mode==='aggettivo'){
-          const adjectives=[["alto","alta","alti","alte"],["bello","bella","belli","belle"]]; const [m_s, f_s, m_p, f_p] = pick(adjectives); const choice = pick(['m_s','f_s','m_p','f_p']); let q, correct; if(choice === 'm_s'){q=`Qual è il femminile di "${m_s}"?`; correct=f_s;} if(choice === 'f_s'){q=`Qual è il plurale maschile di "${f_s}"?`; correct=m_p;} if(choice === 'm_p'){q=`Qual è il singolare di "${m_p}"?`; correct=m_s;} if(choice === 'f_p'){q=`Qual è il singolare femminile di "${f_p}"?`; correct=f_s;} const opts = makeTextOptions(correct, [m_s, f_s, m_p, f_p]); return pack(q,correct,opts,'Pensa a come l\'aggettivo cambia.','Gli aggettivi concordano in genere e numero con il nome.','Ricorda le desinenze: -o/-a e -i/-e.');
-        }
-        function pack(q,c,o,h,e,f){const k=`I:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Italiano',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f};}
-      },
-      Geografia(level){ const capitals = {Europa:[["Italia","Roma"],["Francia","Parigi"],["Spagna","Madrid"],["Germania","Berlino"]], Mondo:[["Giappone","Tokyo"],["USA","Washington"],["Brasile","Brasilia"],["Cina","Pechino"]]}; const pool = level==='easy'?capitals.Europa:capitals.Mondo; const [country,cap] = pick(pool); const q=`Qual è la capitale di ${country}?`; const opts = makeTextOptions(cap, pool.map(x=>x[1])); const key=`G:${level}:${country}`; return {ok:(p)=>uniqueKeyGuard(p,'Geografia',key), q, correct:cap, options:opts, hint:'È la città più importante.', explain:`La capitale di ${country} è ${cap}.`, flashcard:`Paese → Capitale`}; },
-      Scienze(level){ const modes = ['stato','animali','corpo','piante']; const mode = pick(modes); if(mode==='stato'){ const items=[["ghiaccio","solido"],["acqua","liquido"],["vapore","gassoso"]]; const [mat,st]=pick(items); const q=`Lo stato del "${mat}" è…`; const opts=makeTextOptions(st,['solido','liquido','gassoso']); return pack(q,st,opts,'Pensa a com\'è fatto.', 'Ricorda i tre stati della materia.', 'Solido (forma fissa), liquido (scorre), gassoso (si espande).'); } if(mode==='animali'){ const items=[["delfino","mammifero"],["aquila","uccello"],["trota","pesce"]]; const [ani,cl]=pick(items); const opts=makeTextOptions(cl,['mammifero','uccello','pesce','anfibio']); return pack(`Il ${ani} è un…`,cl,opts,'Pensa a come nasce e come respira.', 'Ricorda le classi degli animali.', ' mammifero, uccello, pesce, ecc.'); } if(mode==='corpo'){ const items=[["cuore","pompa il sangue"],["polmoni","respirare"],["stomaco","digerire il cibo"]]; const [org,fun]=pick(items); const q=`Il ${org} serve per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'È un organo, che funzione ha?', 'Ogni organo del corpo ha una funzione.', 'Il corpo ha tante parti che lavorano insieme.'); } if(mode==='piante'){ const items=[["radici","assorbire acqua"],["foglie","fare la fotosintesi"],["fiore","fare i semi"]]; const [parte,fun]=pick(items); const q=`Le ${parte} servono per…`; const opts=makeTextOptions(fun, items.map(x=>x[1])); return pack(q,fun,opts,'Pensa a cosa fa quella parte.', 'Ricorda le funzioni delle parti di una pianta.', 'Radici, fusto, foglie, fiore.'); } function pack(q,c,o,h,e,f){const k=`S:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Scienze',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f};} },
-      Musica(level){ const modes = ['famiglia','ritmo','note']; const mode = pick(modes); if(mode==='famiglia'){ const items=[["violino","archi"],["flauto","fiati"],["tromba","ottoni"]]; const [inst,fam]=pick(items); const q=`A quale famiglia appartiene il ${inst}?`; const opts=makeTextOptions(fam,['archi','fiati','ottoni','percussioni']); return pack(q,fam,opts,'Pensa a come si suona.', 'Gli strumenti si raggruppano in famiglie.', 'Archi, fiati, ottoni, percussioni.'); } if(mode==='ritmo'){ const items=[["semibreve","4 battiti"],["minima","2 battiti"],["semiminima","1 battito"]]; const [note,val]=pick(items); const q=`Una ${note} vale…`; const opts=makeTextOptions(val,['4 battiti','2 battiti','1 battito']); return pack(q,val,opts,'Pensa a quanto dura il suono.', 'Ripassa la durata delle note.', 'Semibreve (4), Minima (2), Semiminima (1).'); } if(mode==='note'){ const noteSeq=['do','re','mi','fa','sol','la','si']; const idx=rand(0,noteSeq.length-2); const q=`Quale nota viene dopo "${noteSeq[idx]}"?`; const correct=noteSeq[idx+1]; const opts=makeTextOptions(correct, noteSeq); return pack(q,correct,opts,'Pensa alla scala musicale.', 'Ricorda la sequenza delle note.', 'Do, Re, Mi, Fa, Sol, La, Si.'); } function pack(q,c,o,h,e,f){const k=`Mu:${level}:${q}`;return{ok:(p)=>uniqueKeyGuard(p,'Musica',k),q,correct:c,options:o,hint:h,explain:e,flashcard:f};} }
-    };
-    function makeNumberOptions(answer, level) { const spread = level === 'easy' ? 3 : level === 'medium' ? 7 : 12; const set = new Set([String(answer)]); while (set.size < 4) { set.add(String(answer + rand(-spread, spread))); } return shuffle(Array.from(set)); }
-    function makeTextOptions(correct, pool) { const set = new Set([correct]); const shuffled = shuffle(pool); for (const x of shuffled) { if (set.size >= 4) break; if (x !== correct) set.add(x); } return shuffle(Array.from(set)); }
-    function pickGenerator() { const subj = $('#subject').value; const level = $('#level').value; return () => Generators[subj](level); }
-
-    // ---------- Session & Scoring ----------
-    const POINTS = { easy: 10, medium: 15, hard: 20 };
-
-    function recordResult(correct) {
-      const profile = getCurrentProfile();
-      const subj = $('#subject').value;
-      const level = $('#level').value;
-      const pts = correct ? POINTS[level] : 0;
-      const subjStats = profile.subjects[subj];
-
-      if (typeof subjStats.subjectScore !== 'object' || subjStats.subjectScore === null) {
-        subjStats.subjectScore = { easy: 0, medium: 0, hard: 0 };
-      }
-      subjStats.subjectScore[level] += pts;
-
-      const todayKey = todayStr();
-      const thisWeekKey = weekStr();
-      const today = subjStats.today[todayKey] || (subjStats.today[todayKey] = { score: 0, completed: 0 });
-      today.score += pts; today.completed += 1;
-      // record per-week scores and keep history
-      subjStats.weeks[thisWeekKey] = subjStats.weeks[thisWeekKey] || { score: 0, completed: 0 };
-      subjStats.weeks[thisWeekKey].score += pts;
-      subjStats.weeks[thisWeekKey].completed += 1;
-      save(app);
-      updateAllUI();
-    }
-
-    function updateTodayKpis() {
-      const p = getCurrentProfile(); const date = todayStr();
-      let totalScore = 0, totalCount = 0;
-      defaultSubjects.forEach(s => { const d = p.subjects[s].today[date]; if (d) { totalScore += d.score; totalCount += d.completed; } });
-      $('#todayScore').textContent = totalScore; $('#todayCount').textContent = totalCount;
-
-      // week KPIs (current week)
-      const wk = weekStr(); let weekScore = 0, weekCount = 0;
-      defaultSubjects.forEach(s => { const w = p.subjects[s].weeks && p.subjects[s].weeks[wk]; if (w) { weekScore += w.score; weekCount += w.completed; } });
-      // show week KPIs by repurposing the subjectScore element subtitle (or create new ones)
-      // We'll append week info under the Today stats
-      const existing = document.querySelector('#weekSummary');
-      if (existing) existing.remove();
-      const weekNode = document.createElement('div');
-      weekNode.id = 'weekSummary';
-      weekNode.className = 'mt-2 text-sm text-slate-600';
-      weekNode.innerHTML = `Questa settimana: <b class="text-green-600">${weekScore}</b> punti • <b class="text-purple-600">${weekCount}</b> attività`;
-      document.querySelector('.mt-8 > .grid')?.appendChild(weekNode);
-    }
-
+    // ---------- Game Logic ----------
     function startSession() {
-      session = { running: true, size: parseInt($('#sessionSize').value, 10), index: 0, current: null, waitingForNext: false };
-      $('#progressBar').style.width = '0%';
-      $('#feedback').textContent = '';
-      $('#textAnswer').value = '';
-      // Clear canvas when starting new session
-      if (drawingState.canvas) {
-        clearCanvas();
+      if (sessionState.isSessionActive) return;
+      sessionState.isSessionActive = true;
+      
+      sessionState.currentSubject = $('#subject').value;
+      sessionState.currentLevel = $('#level').value;
+      sessionState.totalQuestions = parseInt($('#sessionSize').value);
+      sessionState.currentQuestionIndex = 0;
+      sessionState.correctAnswers = 0;
+      
+      updateGameUI(true);
+      
+      sessionState.questions = generateQuestions(sessionState.currentSubject, sessionState.currentLevel, sessionState.totalQuestions);
+      
+      showQuestion();
+    }
+    
+    function generateQuestions(subject, level, count) {
+      if (!DATA[subject] || !DATA[subject][level]) {
+        return [];
       }
-      updateButtonStates();
-      nextQuestion();
-      $('#textAnswer').focus();
+      
+      let allQuestions = DATA[subject][level].questions;
+      let generated = [];
+      while(generated.length < count && allQuestions.length > 0) {
+        generated.push(allQuestions.shift());
+      }
+      return generated;
     }
 
-    function stopSession() {
-      session.running = false;
-      session.waitingForNext = false;
-      session.current = null;
+    function showQuestion() {
+      const q = sessionState.questions[sessionState.currentQuestionIndex];
+      if (!q) {
+        endSession();
+        return;
+      }
       
-      // Reset UI to initial state
-      $('#question').innerHTML = 'Premi "Inizia a Gioca!" per iniziare.';
+      const questionEl = $('#question');
+      const optionsEl = $('#options');
+      const textAnswerWrap = $('#textAnswerWrap');
+      const feedbackEl = $('#feedback');
+      
+      questionEl.innerHTML = q.q;
+      feedbackEl.textContent = '';
+      
+      // Resetta stato UI
+      $('#nextQuestionBtn').classList.add('hidden');
+      $('#drawingToggleBtn').disabled = false;
+      
+      // Gestione tipo di domanda
+      optionsEl.innerHTML = '';
+      textAnswerWrap.classList.add('hidden');
+      if (q.options) {
+        optionsEl.classList.remove('hidden');
+        shuffle(q.options).forEach(opt => {
+          const btn = document.createElement('button');
+          btn.textContent = opt;
+          btn.className = 'option rounded-xl font-semibold text-lg hover:bg-slate-200';
+          btn.addEventListener('click', () => checkAnswer(opt, q.a));
+          optionsEl.appendChild(btn);
+        });
+      } else {
+        optionsEl.classList.add('hidden');
+        textAnswerWrap.classList.remove('hidden');
+        const textInput = $('#textAnswer');
+        textInput.value = '';
+        textInput.disabled = false;
+        $('#submitTextBtn').disabled = false;
+        textInput.focus();
+        textInput.onkeypress = (e) => {
+          if (e.key === 'Enter') {
+            checkAnswer(textInput.value, q.a);
+          }
+        };
+        $('#submitTextBtn').onclick = () => checkAnswer(textInput.value, q.a);
+      }
+      
+      updateProgressBar();
+    }
+    
+    function checkAnswer(userAnswer, correctAnswer) {
+      userAnswer = String(userAnswer).trim().toLowerCase().replace(/\s/g, '');
+      correctAnswer = String(correctAnswer).trim().toLowerCase().replace(/\s/g, '');
+      
+      const isCorrect = userAnswer === correctAnswer;
+      const feedbackEl = $('#feedback');
+      
+      // Disabilita i controlli di risposta
+      $$('.option').forEach(btn => btn.disabled = true);
+      $('#textAnswer').disabled = true;
+      $('#submitTextBtn').disabled = true;
+      $('#drawingToggleBtn').disabled = true;
+
+      if (isCorrect) {
+        feedbackEl.textContent = "🥳 Esatto! Risposta corretta!";
+        feedbackEl.className = "text-center font-bold text-lg mt-4 text-green-600";
+        sessionState.correctAnswers++;
+        updateScore(1);
+        const correctBtn = $$('.option').find(btn => btn.textContent.toLowerCase().replace(/\s/g, '') === correctAnswer);
+        if (correctBtn) correctBtn.classList.add('correct');
+      } else {
+        feedbackEl.textContent = `❌ Sbagliato. La risposta giusta era: "${correctAnswer}"`;
+        feedbackEl.className = "text-center font-bold text-lg mt-4 text-red-600";
+        updateScore(0);
+        const wrongBtn = $$('.option').find(btn => btn.textContent.toLowerCase().replace(/\s/g, '') === userAnswer);
+        if (wrongBtn) wrongBtn.classList.add('wrong');
+        const correctBtn = $$('.option').find(btn => btn.textContent.toLowerCase().replace(/\s/g, '') === correctAnswer);
+        if (correctBtn) correctBtn.classList.add('correct');
+      }
+      
+      $('#nextQuestionBtn').classList.remove('hidden');
+      if (sessionState.currentQuestionIndex >= sessionState.totalQuestions - 1) {
+        $('#nextQuestionBtn').textContent = '🏠 Termina Sessione';
+      }
+    }
+    
+    function nextQuestion() {
+      sessionState.currentQuestionIndex++;
+      if (sessionState.currentQuestionIndex < sessionState.totalQuestions) {
+        showQuestion();
+      } else {
+        endSession();
+      }
+    }
+    
+    function endSession() {
+      sessionState.isSessionActive = false;
+      updateGameUI(false);
+      
+      const finalScore = sessionState.correctAnswers;
+      const totalQuestions = sessionState.totalQuestions;
+      const scorePercentage = (finalScore / totalQuestions) * 100;
+      
+      const feedbackEl = $('#feedback');
+      feedbackEl.textContent = `Partita conclusa! Hai risposto correttamente a ${finalScore} domande su ${totalQuestions} (${scorePercentage.toFixed(0)}%).`;
+      feedbackEl.className = "text-center font-bold text-xl mt-4 text-sky-600";
+      
+      updateScoreDisplay();
+      
+      // Resetta i bottoni
+      $('#nextQuestionBtn').classList.add('hidden');
+      $('#drawingToggleBtn').disabled = true;
+      toggleDrawingBox();
+    }
+    
+    function updateGameUI(isActive) {
+      $('#startBtn').classList.toggle('hidden', isActive);
+      $('#stopSessionBtn').classList.toggle('hidden', !isActive);
+      $('#subject').disabled = isActive;
+      $('#level').disabled = isActive;
+      $('#sessionSize').disabled = isActive;
+      $$('.mathop').forEach(el => el.disabled = isActive);
+      $('#nextQuestionBtn').textContent = '⏭️ Prossima Domanda';
+      $('#question').textContent = isActive ? 'Caricamento...' : 'Premi "Inizia a Gioca!" per iniziare.';
       $('#options').innerHTML = '';
       $('#feedback').textContent = '';
-      $('#helpBox').innerHTML = 'Inizia una partita per ricevere aiuto!';
-      $('#textAnswer').value = '';
-      $('#progressBar').style.width = '0%';
-      
-      // Close drawing box if open
-      if (drawingState.isDrawingBoxOpen) {
-        toggleDrawingBox();
-      }
-      
-      updateButtonStates();
     }
 
-    function renderQuestion(pak){
-      session.current = pak;
-      $('#question').innerHTML = pak.q;
-      $('#question').classList.add('animate-fadeIn');
-      // Remove animation class after animation completes to allow re-triggering
-      setTimeout(() => {
-        $('#question').classList.remove('animate-fadeIn');
-      }, 500);
-      
-      const ops = $('#options'); ops.innerHTML = '';
-      pak.options.forEach(opt => {
-        const b = document.createElement('div');
-        b.className = 'option rounded-xl';
-        b.textContent = opt; b.tabIndex = 0;
-        b.addEventListener('click', () => selectAnswerViaChoice(b, opt));
-        ops.appendChild(b);
-      });
-      $('#helpBox').innerHTML = 'Premi i bottoni per un aiuto!';
-      $('#feedback').textContent = '';
-      // abilita input testo
-      $('#textAnswer').disabled = !session.running;
-      $('#submitTextBtn').disabled = !session.running;
-      $('#textAnswer').value = '';
-      
-      // Reset waiting state
-      session.waitingForNext = false;
-      updateButtonStates();
-    }
-
-    function nextQuestion() {
-      const gen = pickGenerator();
-      const profile = getCurrentProfile();
-      let attempt = 0, pak;
-      while(attempt < 50) {
-        pak = gen();
-        if (pak && typeof pak.ok === 'function' && pak.ok(profile)) break;
-        attempt++;
-      }
-      if (attempt >= 50) {
-        session.running = false;
-        $('#question').innerHTML = 'Congratulazioni! Non ci sono più domande uniche per queste impostazioni!';
-        $('#options').innerHTML = ''; $('#feedback').textContent = 'Prova un altro livello o materia.';
-        updateButtonStates(); return;
-      }
-      renderQuestion(pak);
-    }
-
-    function finishOrContinue() {
-      session.index++;
-      $('#progressBar').style.width = `${Math.min(100, (session.index / session.size) * 100)}%`;
-      
-      if (session.index >= session.size) {
-        session.running = false;
-        session.waitingForNext = false;
-        $('#question').innerHTML = `🎉 Grandioso! Hai finito tutte le domande! 🎉`;
-        $('#options').innerHTML = ''; 
-        $('#feedback').textContent = '';
-        $('#helpBox').innerHTML = 'Hai completato la sessione! Gioca ancora!';
-        updateButtonStates();
-      } else {
-        // Enable "Next Question" mode
-        session.waitingForNext = true;
-        updateButtonStates();
+    // ---------- Score & Progress Management ----------
+    function updateScore(points) {
+      const profile = sessionState.userScores[sessionState.currentProfile];
+      if (profile) {
+        profile.totalScore += points;
+        profile.todayScore += points;
         
-        // Auto-advance after delay or wait for manual click
-        setTimeout(() => {
-          if (session.waitingForNext && session.running) {
-            nextQuestion();
-          }
-        }, 3000); // Auto-advance after 3 seconds
+        if (!profile.subjectScores[sessionState.currentSubject]) {
+          profile.subjectScores[sessionState.currentSubject] = { correct: 0, total: 0 };
+        }
+        profile.subjectScores[sessionState.currentSubject].correct += points;
+        profile.subjectScores[sessionState.currentSubject].total++;
+        
+        saveScores();
+      }
+      updateScoreDisplay();
+    }
+    
+    function saveScores() {
+      localStorage.setItem('userScores', JSON.stringify(sessionState.userScores));
+    }
+
+    function updateScoreDisplay() {
+      const profile = sessionState.userScores[sessionState.currentProfile];
+      if (!profile) return;
+
+      const subjectScore = profile.subjectScores[sessionState.currentSubject];
+      $('#subjectScore').textContent = subjectScore ? `${subjectScore.correct}/${subjectScore.total}` : "0/0";
+      
+      $('#todayCount').textContent = profile.todayCount || '0';
+      $('#todayScore').textContent = profile.todayScore || '0';
+      
+      updateTotalScoresBySubject();
+    }
+    
+    function updateTotalScoresBySubject() {
+      const container = $('#totalScoresBySubject');
+      container.innerHTML = '';
+      const profile = sessionState.userScores[sessionState.currentProfile];
+      if (!profile) return;
+      
+      for (const subject in profile.subjectScores) {
+        const score = profile.subjectScores[subject];
+        const div = document.createElement('div');
+        div.className = "bg-white rounded-2xl p-4 shadow-inner text-center";
+        div.innerHTML = `<span class="text-base">${subject}</span><br><b class="text-xl font-bold text-blue-500">${score.correct}/${score.total}</b>`;
+        container.appendChild(div);
       }
     }
 
-    function normalize(val){ return String(val).trim().toLowerCase(); }
-
-    function lockChoices(){ $$('#options .option').forEach(o => o.style.pointerEvents = 'none'); }
-
-    function handleAnswerResult(isCorrect){
-      $('#feedback').innerHTML = isCorrect ? `🥳 Bravissimo! +${POINTS[$('#level').value]} punti!` : `😢 Ops! La risposta era: <b>${session.current.correct}</b>.`;
-      recordResult(isCorrect);
-      finishOrContinue();
+    function updateProgressBar() {
+      const progress = (sessionState.currentQuestionIndex / sessionState.totalQuestions) * 100;
+      $('#progressBar').style.width = `${progress}%`;
     }
 
-    function selectAnswerViaChoice(el, value) {
-      if (!session.running || session.waitingForNext) return;
-      lockChoices();
-      const correct = normalize(value) === normalize(session.current.correct);
-      el.classList.add(correct ? 'correct' : 'wrong');
-      handleAnswerResult(correct);
+    function showProgressDialog() {
+      const profile = sessionState.userScores[sessionState.currentProfile];
+      if (!profile) return;
+
+      const dialog = $('#progressDialog');
+      const summary = $('#progressSummary');
+      const progressDate = $('#progressDate');
+      
+      progressDate.textContent = formatDateIt(todayStr());
+      
+      let html = `<p class="mb-4">Ciao ${sessionState.currentProfile}! Ecco i tuoi progressi:</p>`;
+      
+      html += `<div class="bg-blue-50 p-4 rounded-xl mb-4">
+        <h4 class="text-xl font-bold text-blue-800">Riassunto di oggi</h4>
+        <p>Domande giocate oggi: <strong>${profile.todayCount || 0}</strong></p>
+        <p>Punti totali oggi: <strong>${profile.todayScore || 0}</strong></p>
+      </div>`;
+      
+      html += `<div class="bg-green-50 p-4 rounded-xl">
+        <h4 class="text-xl font-bold text-green-800">Statistiche per materia</h4>
+        <ul>`;
+      for (const subject in profile.subjectScores) {
+        const score = profile.subjectScores[subject];
+        html += `<li><strong>${subject}:</strong> Risposte corrette ${score.correct} su ${score.total}</li>`;
+      }
+      html += `</ul></div>`;
+      
+      summary.innerHTML = html;
+      dialog.showModal();
     }
 
-    function selectAnswerViaText() {
-      if (!session.running || session.waitingForNext) return;
-      const input = $('#textAnswer');
-      const val = input.value;
-      if (!val.trim()) { input.focus(); return; }
-      lockChoices();
-      const correct = normalize(val) === normalize(session.current.correct);
-      // evidenzia opzione corretta se presente
-      $$('#options .option').forEach(o => {
-        if (normalize(o.textContent) === normalize(session.current.correct)) {
-          o.classList.add('correct');
-        }
-      });
-      handleAnswerResult(correct);
-    }
-
-    // ---------- Event Listeners Setup ----------
-    function setupEventListeners() {
+    // ---------- Event Listeners ----------
+    document.addEventListener('DOMContentLoaded', () => {
+      initProfiles();
+      initDrawingSystem();
+      
       $('#startBtn').addEventListener('click', startSession);
-      $('#stopSessionBtn').addEventListener('click', stopSession);
-      $('#nextQuestionBtn').addEventListener('click', () => {
-        if (session.waitingForNext && session.running) {
-          nextQuestion();
-        }
+      $('#stopSessionBtn').addEventListener('click', endSession);
+      $('#nextQuestionBtn').addEventListener('click', nextQuestion);
+      
+      $('#profileSelect').addEventListener('change', switchProfile);
+      $('#addProfileBtn').addEventListener('click', addProfile);
+      
+      $('#subject').addEventListener('change', (e) => {
+        sessionState.currentSubject = e.target.value;
+        $('#mathOpsWrap').classList.toggle('hidden', sessionState.currentSubject !== 'Matematica');
+        updateScoreDisplay();
+      });
+      $('#level').addEventListener('change', (e) => {
+        sessionState.currentLevel = e.target.value;
+        updateScoreDisplay();
       });
       
-      $('#hintBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '💡 <b>Aiuto:</b> ' + session.current.hint; });
-      $('#explainBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '📖 <b>Spiegazione:</b> ' + session.current.explain; });
-      $('#flashBtn').addEventListener('click', () => { if (session.current) $('#helpBox').innerHTML = '🃏 <b>Flashcard:</b><br>' + session.current.flashcard; });
-
-      $('#submitTextBtn').addEventListener('click', selectAnswerViaText);
-      $('#textAnswer').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); selectAnswerViaText(); } });
-
-      $('#addProfileBtn').addEventListener('click', () => {
-        const name = ($('#newProfileName').value || '').trim();
-        if (!name) { alert('Per favore, scrivi il nome del nuovo amico!'); return; }
-        const id = simpleRandomId();
-        app.profiles.push({ id, name, created: new Date().toISOString(), subjects: objFromArray(defaultSubjects, baseStats) });
-        app.currentProfileId = id;
-        save(app); initProfiles();
-        $('#newProfileName').value = '';
-      });
-
-      $('#profileSelect').addEventListener('change', (e) => { app.currentProfileId = e.target.value; save(app); updateAllUI(); });
-      $('#subject').addEventListener('change', () => { $('#mathOpsWrap').classList.toggle('hidden', $('#subject').value !== 'Matematica'); updateHeaderStats(); });
-      $('#level').addEventListener('change', updateHeaderStats);
-
-      $('#progressBtn').addEventListener('click', () => {
-        const p = getCurrentProfile(); const date = todayStr(); const wk = weekStr();
-        $('#progressDate').textContent = `${formatWeekRange(wk)} – (aggiornato ${formatDateIt(date)})`;
-        let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'; let totalScoreToday = 0, totalCompletedToday = 0, totalWeekScore = 0, totalWeekCompleted = 0;
-        defaultSubjects.forEach(s => {
-          const subjData = p.subjects[s] || baseStats();
-          const todayData = subjData.today[date];
-          const scoreToday = todayData ? todayData.score : 0; 
-          const completedToday = todayData ? todayData.completed : 0;
-          const weekData = subjData.weeks && subjData.weeks[wk] ? subjData.weeks[wk] : { score:0, completed:0 };
-          const weekScore = weekData.score; const weekCompleted = weekData.completed;
-          const totalScores = subjData.subjectScore;
-          const totalSubjectScore = (totalScores.easy || 0) + (totalScores.medium || 0) + (totalScores.hard || 0);
-
-          totalScoreToday += scoreToday; 
-          totalCompletedToday += completedToday;
-          totalWeekScore += weekScore; totalWeekCompleted += weekCompleted;
-
-          if (totalSubjectScore > 0 || completedToday > 0 || weekCompleted > 0) {
-            html += `
-              <div class="bg-white rounded-xl p-4 shadow-inner text-base animate-popIn">
-                <div class="font-bold text-sky-700 text-xl mb-1">${s}</div>
-                <div>Del <b>${formatDateIt(date)}</b>: <b class="text-purple-500">${completedToday}</b> attività • <b class="text-green-500">${scoreToday}</b> punti</div>
-                <div class="mt-1">Questa settimana: <b class="text-purple-600">${weekCompleted}</b> attività • <b class="text-green-600">${weekScore}</b> punti</div>
-                <div class="mt-1">Punteggio Totale: <b class="text-blue-600 text-lg">${totalSubjectScore}</b> punti</div>
-                <div class="text-sm text-slate-600 mt-1">
-                  (Facile: <b class="text-green-600">${totalScores.easy || 0}</b>, 
-                   Medio: <b class="text-orange-600">${totalScores.medium || 0}</b>, 
-                   Difficile: <b class="text-red-600">${totalScores.hard || 0}</b>)
-                </div>
-              </div>`;
-          }
-        });
-        html += '</div>';
-        html += `<div class="bg-sky-200 rounded-xl p-4 mt-6 text-xl font-bold shadow-md text-center animate-popIn">Totale del <b>${formatDateIt(date)}</b>: <b>${totalCompletedToday}</b> attività • <b>${totalScoreToday}</b> punti</div>`;
-        html += `<div class="bg-sky-100 rounded-xl p-4 mt-4 text-lg font-bold shadow-md text-center animate-popIn">Totale questa settimana: <b>${totalWeekCompleted}</b> attività • <b>${totalWeekScore}</b> punti</div>`;
-        html += '<div class="mt-4 text-sm text-slate-600">Storico settimane (ultime 6):</div>';
-        // weeks history for this profile grouped by subject
-        const weeksMap = {};
-        defaultSubjects.forEach(s => {
-          const subjData = p.subjects[s] || baseStats();
-          if (subjData.weeks) {
-            Object.keys(subjData.weeks).forEach(wkKey => {
-              weeksMap[wkKey] = weeksMap[wkKey] || { score:0, completed:0 };
-              weeksMap[wkKey].score += subjData.weeks[wkKey].score;
-              weeksMap[wkKey].completed += subjData.weeks[wkKey].completed;
-            });
-          }
-        });
-        const weeksSorted = Object.keys(weeksMap).sort().reverse().slice(0,6);
-        html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">';
-        weeksSorted.forEach(wkKey => { const w = weeksMap[wkKey]; html += `<div class="bg-white p-2 rounded-md text-sm shadow-inner animate-popIn">${formatWeekRange(wkKey)}: <b>${w.completed}</b> attività • <b>${w.score}</b> punti</div>`; });
-        html += '</div>';
-        $('#progressSummary').innerHTML = html; $('#progressDialog').showModal();
-      });
-
-      let currentScale = 1.0; const ZOOM_STEP = 0.1, MAX_ZOOM = 1.6, MIN_ZOOM = 0.5;
-      const updateZoom = () => { currentScale = Math.round(currentScale * 100) / 100; document.body.style.transform = `scale(${currentScale})`; $('#zoomDisplay').textContent = `${Math.round(currentScale * 100)}%`; $('#zoomInBtn').disabled = currentScale >= MAX_ZOOM; $('#zoomOutBtn').disabled = currentScale <= MIN_ZOOM; };
-      $('#zoomInBtn').addEventListener('click', () => { if (currentScale < MAX_ZOOM) { currentScale += ZOOM_STEP; updateZoom(); } });
-      $('#zoomOutBtn').addEventListener('click', () => { if (currentScale > MIN_ZOOM) { currentScale -= ZOOM_STEP; updateZoom(); } });
-      updateZoom();
-
-      // Nuovi event listener per Compiti Settimanali
-      // L'handler per il bottone dei compiti settimanali è definito più sotto,
-      // dove gestiamo anche il reset dello stato del dialogo.
-      // Helper to pronounce a single word in the appropriate language. It will detect
-      // whether the word contains Italian accented characters to choose the voice.
-      function speakWord(word) {
-        if (!word) return;
-        const englishWanted = (() => {
-          // If the word contains only ASCII letters without accented vowels, consider it English
-          const hasItalianChar = /[àèìòùé]/i.test(word);
-          const isAsciiLetters = /^[A-Za-z]+$/.test(word);
-          return isAsciiLetters && !hasItalianChar;
-        })();
-        const utter = new SpeechSynthesisUtterance(word);
-        // Set desired language code; the actual voice will be selected below
-        utter.lang = englishWanted ? 'en-US' : 'it-IT';
-        try {
-          // Attempt to select an appropriate voice by matching the language prefix
-          const voices = window.speechSynthesis.getVoices();
-          let selectedVoice = null;
-          if (voices && voices.length) {
-            const targetPrefix = englishWanted ? 'en' : 'it';
-            selectedVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(targetPrefix));
-          }
-          if (selectedVoice) {
-            utter.voice = selectedVoice;
-          }
-        } catch (e) {
-          // In case getVoices is unavailable, proceed without selecting voice
-        }
-        // Cancel any ongoing speech before starting a new one
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.cancel();
-        }
-        window.speechSynthesis.speak(utter);
-      }
-
-      // When clicking the Spelling & Pronuncia button, update the spelling for each
-      // provided word and attach a click handler so that only the clicked word is
-      // spoken. No words are pronounced automatically to avoid reading all entries
-      // at once.
-      $('#spellPronounceBtn').addEventListener('click', () => {
-        const fields = $$('#homeworkFields .homeworkWord');
-        const spelleds = $$('#homeworkFields .spelled');
-        // Reset the current homework words array
-        currentHomeworkWords = [];
-        fields.forEach((input, i) => {
-          const word = (input.value || '').trim();
-          const target = spelleds[i];
-          // Save the word for later verification (even if empty)
-          currentHomeworkWords.push(word);
-          if (word) {
-            // Disable original field so it can't be changed during verification
-            input.disabled = true;
-            // Build spelled-out representation (e.g. C - A - N - E)
-            target.textContent = word.toUpperCase().split('').join(' - ');
-            // Store the original word as a data attribute for later retrieval
-            target.dataset.word = word;
-            // Make the spelled text look clickable
-            target.style.cursor = 'pointer';
-            // Remove any previous click handler before assigning a new one
-            target.onclick = null;
-            // Attach a click handler to pronounce only this word
-            target.addEventListener('click', () => {
-              speakWord(target.dataset.word);
-            });
-          } else {
-            // If no word provided, keep spelled area empty
-            target.textContent = '';
-            target.dataset.word = '';
-            target.style.cursor = 'default';
-            target.onclick = null;
-          }
-        });
-        // Generate example sentences for each word and display them
-        const exampleSpans = $$('#exampleFields .exampleSentence');
-        exampleSpans.forEach((span, idx) => {
-          const w = (currentHomeworkWords[idx] || '').trim();
-          if (w) {
-            // Determina la lingua della parola e seleziona il set di template corretto
-            const lang = detectLang(w);
-            const templates = lang === 'en' ? EXAMPLE_TEMPLATES_EN : EXAMPLE_TEMPLATES_IT;
-            // Seleziona un template in base all'indice per diversificare le frasi
-            const template = templates[idx % templates.length];
-            span.textContent = template.replace(/\[word\]/g, w);
-          } else {
-            span.textContent = '';
-          }
-        });
-        // Show the example section
-        $('#exampleSection').classList.remove('hidden');
-
-        // Show the verification section so the user can retype the words
-        const verifySection = document.getElementById('verifySection');
-        verifySection.classList.remove('hidden');
-        // Clear any existing input values and results from previous runs
-        $$('#verifyFields .verifyWord').forEach(input => { input.value = ''; });
-        $$('#verifyFields .verifyResult').forEach(span => { span.textContent = ''; span.classList.remove('text-green-600','text-red-600'); });
-      });
-
-      // Aggiunta della funzionalità per caricare l'immagine del profilo
+      $('#progressBtn').addEventListener('click', showProgressDialog);
+      
       $('#profileImagePlaceholder').addEventListener('click', () => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = e => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
           const file = e.target.files[0];
           if (file) {
             const reader = new FileReader();
-            reader.onload = function(event) {
-              const profile = getCurrentProfile();
-              profile.image = event.target.result;
-              save(app);
-              updateProfileImage();
+            reader.onload = (event) => {
+              const profile = sessionState.userScores[sessionState.currentProfile];
+              if (profile) {
+                profile.image = event.target.result;
+                saveScores();
+                updateProfileImage();
+              }
             };
             reader.readAsDataURL(file);
           }
         };
-        fileInput.click();
+        input.click();
+      });
+      
+      $('#zoomInBtn').addEventListener('click', () => {
+        const currentZoom = parseFloat(document.body.style.transform.replace('scale(', '').replace(')', '')) || 1;
+        document.body.style.transform = `scale(${currentZoom + 0.1})`;
+        $('#zoomDisplay').textContent = `${Math.round((currentZoom + 0.1) * 100)}%`;
       });
 
-      // Verifica delle parole digitate: confronta le parole inserite nel secondo box con quelle originali.
-      $('#checkWordsBtn').addEventListener('click', () => {
-        const verifyInputs = $$('#verifyFields .verifyWord');
-        const verifyResults = $$('#verifyFields .verifyResult');
-        verifyInputs.forEach((input, index) => {
-          const userWord = (input.value || '').trim();
-          const origWord = (currentHomeworkWords[index] || '').trim();
-          const resSpan = verifyResults[index];
-          // If there was no original word, clear the result
-          if (!origWord) {
-            resSpan.textContent = '';
-            resSpan.classList.remove('text-green-600','text-red-600');
-          } else {
-            const isCorrect = userWord && userWord.toLowerCase() === origWord.toLowerCase();
-            resSpan.textContent = isCorrect ? 'Giusto' : 'Errato';
-            // Remove previous color classes
-            resSpan.classList.remove('text-green-600','text-red-600');
-            // Apply appropriate Tailwind color class
-            resSpan.classList.add(isCorrect ? 'text-green-600' : 'text-red-600');
-          }
-        });
+      $('#zoomOutBtn').addEventListener('click', () => {
+        const currentZoom = parseFloat(document.body.style.transform.replace('scale(', '').replace(')', '')) || 1;
+        document.body.style.transform = `scale(${Math.max(0.5, currentZoom - 0.1)})`;
+        $('#zoomDisplay').textContent = `${Math.round(Math.max(0.5, currentZoom - 0.1) * 100)}%`;
       });
-
-      // ---------------------- Compiti Settimanali ----------------------
-      // Keep track of the original homework words for the verification phase
-      let currentHomeworkWords = [];
-
-      // Template di frasi di esempio separate per italiano e inglese. Ogni frase contiene il segnaposto [word] che verrà sostituito con la parola inserita.
-      const EXAMPLE_TEMPLATES_IT = [
-        'Ieri ho visto la parola "[word]" in un libro e ho imparato cosa significa.',
-        'A scuola abbiamo decorato la parola "[word]" sul quaderno con i colori.',
-        'Mi piace leggere storie dove si parla di "[word]" in modo semplice.',
-        'La maestra ci ha spiegato che "[word]" è una parola importante da conoscere.',
-        'A casa ho inventato una storia con "[word]" che ho raccontato alla mia famiglia.',
-        'In un sogno ho visto "[word]" e mi sono svegliato felice.',
-        'Quando scrivi "[word]", ricordati di tutte le lettere e pronunciale bene.',
-        'Se ripeti "[word]" ad alta voce, diventerai sempre più bravo a ricordarla.',
-        'Abbiamo recitato una poesia che parlava di "[word]" e mi è piaciuta molto.',
-        'Pensare a "[word]" mi fa venire in mente qualcosa di bello e divertente.'
-      ];
-
-      const EXAMPLE_TEMPLATES_EN = [
-        'Yesterday I saw the word "[word]" in a book and learned what it means.',
-        'At school we decorated the word "[word]" in our notebook with colors.',
-        'I like to read stories that talk about "[word]" in a simple way.',
-        'The teacher told us that "[word]" is an important word to know.',
-        'At home I made up a story with "[word]" and told it to my family.',
-        'In a dream I saw "[word]" and woke up feeling happy.',
-        'When you write "[word]", remember all the letters and say them clearly.',
-        'If you repeat "[word]" out loud, you will get better at remembering it.',
-        'We recited a poem that talked about "[word]" and I liked it a lot.',
-        'Thinking of "[word]" makes me imagine something nice and fun.'
-      ];
-
-      // Funzione per stimare la lingua di una parola. Restituisce 'en' per l'inglese o 'it' per l'italiano.
-      function detectLang(word) {
-        const w = (word || '').toLowerCase();
-        // Se contiene caratteri accentati, consideriamo italiano
-        if (/[àèéìòù]/.test(w)) return 'it';
-        // Alcune sequenze di lettere sono tipiche dell'inglese (double vowels, digrammi, suffissi).
-        const englishPattern = /(ee|oo|th|sh|ch|ck|ph|ing|tion|ed|er|ly|y)$/;
-        if (englishPattern.test(w)) return 'en';
-        // Se finisce con una consonante (non vocale), è più probabile che sia inglese
-        if (/[^aeiou]$/.test(w)) return 'en';
-        // Altrimenti, assumiamo che sia italiano
-        return 'it';
-      }
-
-      // Show the homework modal
-      $('#weeklyHomeworkBtn').addEventListener('click', () => {
-        const dlg = document.getElementById('homeworkDialog');
-        dlg.showModal();
-        // Reset verify and example sections when the dialog is opened
-        $('#verifySection').classList.add('hidden');
-        $$('#verifyFields .verifyWord').forEach(input => { input.value = ''; });
-        $$('#verifyFields .verifyResult').forEach(span => { span.textContent = ''; span.classList.remove('text-green-600','text-red-600'); });
-        $('#exampleSection').classList.add('hidden');
-        $$('#exampleFields .exampleSentence').forEach(span => { span.textContent = ''; });
-        // Re-enable homework inputs and clear spelled text
-        const fields = $$('#homeworkFields .homeworkWord');
-        const spelleds = $$('#homeworkFields .spelled');
-        fields.forEach(input => { input.disabled = false; });
-        spelleds.forEach(span => { span.textContent = ''; span.dataset.word = ''; span.style.cursor = 'default'; span.onclick = null; });
-      });
-
-      // Handle window resize for canvas
-      window.addEventListener('resize', () => {
-        if (drawingState.isDrawingBoxOpen) {
-          resizeCanvas();
-        }
-      });
-    }
-
-    // ---------- App Boot ----------
-    initProfiles();
-    $('#mathOpsWrap').classList.toggle('hidden', $('#subject').value !== 'Matematica');
-    setupEventListeners();
-    initDrawingSystem();
+    });
   })();
   </script>
 </body>
